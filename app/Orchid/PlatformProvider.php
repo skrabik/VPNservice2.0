@@ -34,6 +34,11 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.notifications')
                 ->permission('platform.notifications'),
 
+            Menu::make(__('Servers'))
+                ->icon('icon-comment')
+                ->route('platform.servers')
+                ->permission('platform.servers'),
+
             Menu::make(__('Users'))
                 ->icon('bs.people')
                 ->route('platform.systems.users')
@@ -61,7 +66,8 @@ class PlatformProvider extends OrchidServiceProvider
                 ->addPermission('platform.systems.users', __('Users')),
 
             ItemPermission::group(__('Platform'))
-                ->addPermission('platform.notifications', __('Admin Notifications')),
+                ->addPermission('platform.notifications', __('Admin Notifications'))
+                ->addPermission('platform.servers', __('Servers')),
         ];
     }
 }

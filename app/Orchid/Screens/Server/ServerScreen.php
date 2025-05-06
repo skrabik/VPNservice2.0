@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Orchid\Screens\AdminNotifications;
+namespace App\Orchid\Screens\Server;
 
-use App\Models\AdminNotification;
+use App\Models\Server;
+use App\Orchid\Layouts\Server\ServerLayout;
 use Orchid\Screen\Screen;
-use Orchid\Support\Facades\Layout;
 
-class AdminNotificationScreen extends Screen
+class ServerScreen extends Screen
 {
     /**
      * Fetch data to be displayed on the screen.
@@ -16,7 +16,7 @@ class AdminNotificationScreen extends Screen
     public function query(): iterable
     {
         return [
-            'notifications' => AdminNotification::all(),
+            'servers' => Server::all(),
         ];
     }
 
@@ -25,7 +25,7 @@ class AdminNotificationScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Admin Notifications';
+        return 'ServerScreen';
     }
 
     /**
@@ -41,7 +41,7 @@ class AdminNotificationScreen extends Screen
     public function permission(): ?iterable
     {
         return [
-            'platform.notifications',
+            'platform.servers',
         ];
     }
 
@@ -53,7 +53,7 @@ class AdminNotificationScreen extends Screen
     public function layout(): iterable
     {
         return [
-            Layout::view('layouts.AdminNotification.table'),
+            ServerLayout::class,
         ];
     }
 }

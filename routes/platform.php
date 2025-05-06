@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Orchid\Screens\AdminNotifications\AdminNotificationScreen;
+use App\Orchid\Screens\AdminNotification\AdminNotificationScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
+use App\Orchid\Screens\Server\ServerScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
@@ -24,6 +25,9 @@ use Tabuna\Breadcrumbs\Trail;
 
 Route::screen('info', AdminNotificationScreen::class)
     ->name('platform.notifications');
+
+Route::screen('servers', ServerScreen::class)
+    ->name('platform.servers');
 
 Route::screen('profile', UserProfileScreen::class)
     ->name('platform.profile')
@@ -52,7 +56,7 @@ Route::prefix('users')->group(function () {
 });
 
 Route::prefix('roles')->group(function () {
-    Route::screen('roles', RoleListScreen::class)
+    Route::screen('', RoleListScreen::class)
         ->name('platform.systems.roles')
         ->breadcrumbs(fn (Trail $trail) => $trail
             ->parent('platform.index')
