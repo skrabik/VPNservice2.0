@@ -22,7 +22,7 @@ use Tabuna\Breadcrumbs\Trail;
 |
 */
 
-Route::screen('notifications', AdminNotificationScreen::class)
+Route::screen('info', AdminNotificationScreen::class)
     ->name('platform.notifications');
 
 Route::screen('profile', UserProfileScreen::class)
