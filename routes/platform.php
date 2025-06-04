@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Orchid\Screens\AdminNotification\AdminNotificationScreen;
 use App\Orchid\Screens\Customers\CustomerEditScreen;
 use App\Orchid\Screens\Customers\CustomerListScreen;
+use App\Orchid\Screens\PaymentMethods\PaymentMethodEditScreen;
+use App\Orchid\Screens\PaymentMethods\PaymentMethodListScreen;
 use App\Orchid\Screens\Plans\PlanEditScreen;
 use App\Orchid\Screens\Plans\PlanListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
@@ -117,4 +119,24 @@ Route::prefix('plans')->group(function () {
         ->breadcrumbs(fn (Trail $trail, $plan) => $trail
             ->parent('platform.plans')
             ->push($plan->title, route('platform.plans.edit', $plan)));
+});
+
+Route::prefix('payment_methods')->group(function () {
+    Route::screen('/', PaymentMethodListScreen::class)
+        ->name('platform.payment_methods')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push(__('Payment Methods'), route('platform.payment_methods')));
+
+    Route::screen('create', PaymentMethodEditScreen::class)
+        ->name('platform.payment_methods.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.payment_methods')
+            ->push(__('Create'), route('platform.payment_methods.create')));
+
+    Route::screen('{payment_method}/edit', PaymentMethodEditScreen::class)
+        ->name('platform.payment_methods.edit')
+        ->breadcrumbs(fn (Trail $trail, $payment_method) => $trail
+            ->parent('platform.payment_methods')
+            ->push($payment_method->title, route('platform.payment_methods.edit', $payment_method)));
 });

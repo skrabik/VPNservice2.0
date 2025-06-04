@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Database\Seeders\Platform\AdminNotificationSeeder;
 use Database\Seeders\Platform\CustomerSeeder;
+use Database\Seeders\Platform\PaymentMethodSeeder;
 use Database\Seeders\Platform\PlanSeeder;
 use Illuminate\Database\Seeder;
 
@@ -16,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PlanSeeder::class,
+            PaymentMethodSeeder::class,
             AdminNotificationSeeder::class,
             CustomerSeeder::class,
         ]);
