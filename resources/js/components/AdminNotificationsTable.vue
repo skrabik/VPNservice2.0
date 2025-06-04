@@ -53,7 +53,6 @@ export default {
 <style scoped>
 .notification-container {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 400px;
     margin: 0 auto;
 }
 

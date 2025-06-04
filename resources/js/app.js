@@ -9,7 +9,7 @@ Alpine.start();
 function initializeVue() {
     if (document.querySelector('#admin-notifications-table')) {
         const app = createApp({});
-        app.component('admin-notifications-table', AdminNotificationsTable);
+        app.component('admin-notification', AdminNotificationsTable);
         app.mount('#admin-notifications-table');
     }
 }
