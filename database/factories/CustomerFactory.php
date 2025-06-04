@@ -17,7 +17,12 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => bcrypt('password'),
+            'telegram_id' => $this->faker->optional(0.7)->numerify('##########'),
+            'telegram_username' => $this->faker->optional(0.7)->userName(),
         ];
     }
 }

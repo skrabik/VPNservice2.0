@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Database\Seeders\Platform\AdminNotificationSeeder;
+use Database\Seeders\Platform\CustomerSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminNotificationSeeder::class,
+            CustomerSeeder::class,
         ]);
     }
 }
