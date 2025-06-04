@@ -6,6 +6,7 @@ namespace App\Orchid\Screens\Customers;
 
 use App\Models\Customer;
 use App\Orchid\Layouts\Customer\CustomerEditLayout;
+use App\Orchid\Layouts\Customer\CustomerSubscriptionsLayout;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -29,6 +30,7 @@ class CustomerEditScreen extends Screen
     {
         return [
             'customer' => $customer,
+            'subscriptions' => $customer->exists ? $customer->subscriptions()->with('plan')->get() : collect(),
         ];
     }
 
@@ -90,6 +92,10 @@ class CustomerEditScreen extends Screen
                         ->icon('bs.check-circle')
                         ->method('save')
                 ),
+            Layout::block(CustomerSubscriptionsLayout::class)
+                ->title(__('Subscriptions'))
+                ->description(__('List of customer subscriptions.'))
+                ->canSee($this->customer->exists),
         ];
     }
 
