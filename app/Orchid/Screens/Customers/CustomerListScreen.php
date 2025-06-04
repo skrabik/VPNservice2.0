@@ -1,27 +1,25 @@
 <?php
 
-namespace App\Orchid\Screens\Server;
+declare(strict_types=1);
 
-use App\Models\Server;
-use App\Orchid\Layouts\Server\ServerEditLayout;
+namespace App\Orchid\Screens\Customers;
+
+use App\Models\Customer;
+use App\Orchid\Layouts\Customer\CustomerListLayout;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
 
-class ServerEditScreen extends Screen
+class CustomerListScreen extends Screen
 {
-    /**
-     * @var Server
-     */
-    public $server;
-
     /**
      * Fetch data to be displayed on the screen.
      *
      * @return array
      */
-    public function query(Server $server): iterable
+    public function query(): iterable
     {
         return [
-            'server' => $server,
+            'customers' => Customer::defaultSort('id', 'desc')->paginate(),
         ];
     }
 
@@ -30,13 +28,21 @@ class ServerEditScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Server Edit';
+        return 'Customers';
+    }
+
+    /**
+     * Display header description.
+     */
+    public function description(): ?string
+    {
+        return 'List of all customers';
     }
 
     public function permission(): ?iterable
     {
         return [
-            'platform.systems.servers',
+            'platform.customers',
         ];
     }
 
@@ -48,7 +54,9 @@ class ServerEditScreen extends Screen
     public function commandBar(): iterable
     {
         return [
-
+            Link::make(__('Add'))
+                ->icon('bs.plus-circle')
+                ->route('platform.customers.create'),
         ];
     }
 
@@ -60,7 +68,7 @@ class ServerEditScreen extends Screen
     public function layout(): iterable
     {
         return [
-            ServerEditLayout::class,
+            CustomerListLayout::class,
         ];
     }
 }

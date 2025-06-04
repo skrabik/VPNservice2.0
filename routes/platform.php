@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Orchid\Screens\AdminNotification\AdminNotificationScreen;
+use App\Orchid\Screens\Customers\CustomerEditScreen;
+use App\Orchid\Screens\Customers\CustomerListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerScreen;
@@ -34,6 +36,26 @@ Route::screen('profile', UserProfileScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Profile'), route('platform.profile')));
+
+Route::prefix('customers')->group(function () {
+    Route::screen('/', CustomerListScreen::class)
+        ->name('platform.customers')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push(__('Customers'), route('platform.customers')));
+
+    Route::screen('create', CustomerEditScreen::class)
+        ->name('platform.customers.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.customers')
+            ->push(__('Create'), route('platform.customers.create')));
+
+    Route::screen('{customer}/edit', CustomerEditScreen::class)
+        ->name('platform.customers.edit')
+        ->breadcrumbs(fn (Trail $trail, $customer) => $trail
+            ->parent('platform.customers')
+            ->push($customer->first_name, route('platform.customers.edit', $customer)));
+});
 
 Route::prefix('users')->group(function () {
     Route::screen('/', UserListScreen::class)
