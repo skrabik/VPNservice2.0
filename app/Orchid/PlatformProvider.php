@@ -55,6 +55,11 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.systems.roles')
                 ->permission('platform.systems.roles')
                 ->divider(),
+
+            Menu::make(__('Plans'))
+                ->icon('bs.list')
+                ->route('platform.plans')
+                ->permission('platform.plans'),
         ];
     }
 
@@ -73,7 +78,8 @@ class PlatformProvider extends OrchidServiceProvider
             ItemPermission::group(__('Platform'))
                 ->addPermission('platform.notifications', __('Admin Notifications'))
                 ->addPermission('platform.servers', __('Servers'))
-                ->addPermission('platform.customers', __('Customers')),
+                ->addPermission('platform.customers', __('Customers'))
+                ->addPermission('platform.plans', __('Plans')),
         ];
     }
 }

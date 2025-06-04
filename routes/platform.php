@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Orchid\Screens\AdminNotification\AdminNotificationScreen;
 use App\Orchid\Screens\Customers\CustomerEditScreen;
 use App\Orchid\Screens\Customers\CustomerListScreen;
+use App\Orchid\Screens\Plans\PlanEditScreen;
+use App\Orchid\Screens\Plans\PlanListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerScreen;
@@ -95,4 +97,24 @@ Route::prefix('roles')->group(function () {
         ->breadcrumbs(fn (Trail $trail, $role) => $trail
             ->parent('platform.systems.roles')
             ->push($role->name, route('platform.systems.roles.edit', $role)));
+});
+
+Route::prefix('plans')->group(function () {
+    Route::screen('/', PlanListScreen::class)
+        ->name('platform.plans')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push(__('Plans'), route('platform.plans')));
+
+    Route::screen('create', PlanEditScreen::class)
+        ->name('platform.plans.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.plans')
+            ->push(__('Create'), route('platform.plans.create')));
+
+    Route::screen('{plan}/edit', PlanEditScreen::class)
+        ->name('platform.plans.edit')
+        ->breadcrumbs(fn (Trail $trail, $plan) => $trail
+            ->parent('platform.plans')
+            ->push($plan->title, route('platform.plans.edit', $plan)));
 });
