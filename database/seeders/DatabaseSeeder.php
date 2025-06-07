@@ -6,6 +6,7 @@ use Database\Seeders\Platform\AdminNotificationSeeder;
 use Database\Seeders\Platform\CustomerSeeder;
 use Database\Seeders\Platform\PaymentMethodSeeder;
 use Database\Seeders\Platform\PlanSeeder;
+use Database\Seeders\Platform\ServerSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,6 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            ServerSeeder::class,
             PlanSeeder::class,
             PaymentMethodSeeder::class,
             AdminNotificationSeeder::class,

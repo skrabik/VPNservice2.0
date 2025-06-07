@@ -3,7 +3,7 @@
 namespace App\Orchid\Screens\Server;
 
 use App\Models\Server;
-use App\Orchid\Layouts\Server\ServerLayout;
+use App\Orchid\Layouts\Server\ServerListLayout;
 use Orchid\Screen\Screen;
 
 class ServerScreen extends Screen
@@ -53,7 +53,7 @@ class ServerScreen extends Screen
     public function layout(): iterable
     {
         return [
-            ServerLayout::class,
+            ServerListLayout::class,
         ];
     }
 }
