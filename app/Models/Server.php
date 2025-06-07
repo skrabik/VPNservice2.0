@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Orchid\Filters\Filterable;
 use Orchid\Screen\AsSource;
 
@@ -59,4 +60,12 @@ class Server extends Model
         'active',
         'created_at',
     ];
+
+    /**
+     * Получить параметры сервера.
+     */
+    public function parameters(): HasMany
+    {
+        return $this->hasMany(ServerParameter::class);
+    }
 }

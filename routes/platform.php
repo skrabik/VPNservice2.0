@@ -13,6 +13,7 @@ use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerEditScreen;
 use App\Orchid\Screens\Server\ServerListScreen;
+use App\Orchid\Screens\Server\ServerParameterEditScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
@@ -158,4 +159,16 @@ Route::prefix('servers')->group(function () {
         ->breadcrumbs(fn (Trail $trail, $server) => $trail
             ->parent('platform.servers')
             ->push(__('Edit'), route('platform.servers.edit', $server)));
+
+    Route::screen('{server}/parameters/create', ServerParameterEditScreen::class)
+        ->name('platform.servers.parameters.create')
+        ->breadcrumbs(fn (Trail $trail, $server) => $trail
+            ->parent('platform.servers.edit', $server)
+            ->push(__('Create Parameter'), route('platform.servers.parameters.create', $server)));
+
+    Route::screen('{server}/parameters/{parameter}/edit', ServerParameterEditScreen::class)
+        ->name('platform.servers.parameters.edit')
+        ->breadcrumbs(fn (Trail $trail, $server, $parameter) => $trail
+            ->parent('platform.servers.edit', $server)
+            ->push(__('Edit Parameter'), route('platform.servers.parameters.edit', [$server, $parameter])));
 });

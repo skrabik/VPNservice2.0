@@ -6,6 +6,7 @@ namespace App\Orchid\Screens\Server;
 
 use App\Models\Server;
 use App\Orchid\Layouts\Server\ServerEditLayout;
+use App\Orchid\Layouts\Server\ServerParameterLayout;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -29,6 +30,7 @@ class ServerEditScreen extends Screen
     {
         return [
             'server' => $server,
+            'parameters' => $server->parameters,
         ];
     }
 
@@ -61,7 +63,7 @@ class ServerEditScreen extends Screen
     {
         return [
             Button::make('Delete')
-                ->icon('bs.trash3')
+                ->icon('bs.trash')
                 ->confirm('Are you sure you want to delete this server?')
                 ->method('remove')
                 ->canSee($this->server->exists),
@@ -89,6 +91,9 @@ class ServerEditScreen extends Screen
                         ->icon('bs.check-circle')
                         ->method('save')
                 ),
+
+            Layout::block(ServerParameterLayout::class)
+                ->title('Server parameters'),
         ];
     }
 
