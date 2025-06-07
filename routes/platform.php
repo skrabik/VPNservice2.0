@@ -11,11 +11,13 @@ use App\Orchid\Screens\Plans\PlanEditScreen;
 use App\Orchid\Screens\Plans\PlanListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
-use App\Orchid\Screens\Server\ServerScreen;
+use App\Orchid\Screens\Server\ServerEditScreen;
+use App\Orchid\Screens\Server\ServerListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
 use Illuminate\Support\Facades\Route;
+use Orchid\Support\Facades\Dashboard;
 use Tabuna\Breadcrumbs\Trail;
 
 /*
@@ -31,9 +33,6 @@ use Tabuna\Breadcrumbs\Trail;
 
 Route::screen('info', AdminNotificationScreen::class)
     ->name('platform.notifications');
-
-Route::screen('servers', ServerScreen::class)
-    ->name('platform.servers');
 
 Route::screen('profile', UserProfileScreen::class)
     ->name('platform.profile')
@@ -139,4 +138,24 @@ Route::prefix('payment_methods')->group(function () {
         ->breadcrumbs(fn (Trail $trail, $payment_method) => $trail
             ->parent('platform.payment_methods')
             ->push($payment_method->title, route('platform.payment_methods.edit', $payment_method)));
+});
+
+Route::prefix('servers')->group(function () {
+    Route::screen('/', ServerListScreen::class)
+        ->name('platform.servers')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push(__('Servers'), route('platform.servers')));
+
+    Route::screen('create', ServerEditScreen::class)
+        ->name('platform.servers.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.servers')
+            ->push(__('Create'), route('platform.servers.create')));
+
+    Route::screen('{server}/edit', ServerEditScreen::class)
+        ->name('platform.servers.edit')
+        ->breadcrumbs(fn (Trail $trail, $server) => $trail
+            ->parent('platform.servers')
+            ->push(__('Edit'), route('platform.servers.edit', $server)));
 });

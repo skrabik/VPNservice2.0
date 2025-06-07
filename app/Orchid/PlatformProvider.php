@@ -39,9 +39,10 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.customers')
                 ->permission('platform.customers'),
 
-            Menu::make(__('Servers'))
-                ->icon('icon-comment')
+            Menu::make('Servers')
+                ->icon('server')
                 ->route('platform.servers')
+                ->title('Servers')
                 ->permission('platform.servers'),
 
             Menu::make(__('Users'))
