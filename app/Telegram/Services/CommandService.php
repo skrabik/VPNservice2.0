@@ -31,7 +31,9 @@ class CommandService
     {
         return match ($command_name) {
             '/start' => Commands\StartCommand::class,
-            default => Commands\StartCommand::class,
+            '/key', '🔑 Получить ключ' => Commands\KeyCommand::class,
+            '/pay' => Commands\PayCommand::class,
+            default => Commands\HelpCommand::class,
         };
     }
 }

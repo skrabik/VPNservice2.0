@@ -39,9 +39,23 @@ class TelegramManager
     public static function parseMessageData(Update $update): array
     {
         $message_data = self::getMessageData($update);
-        $parts = explode(' ', $message_data);
-        $command_name = $parts[0];
-        $params = array_slice($parts, 1);
+        $parts = explode('?', $message_data, 2);
+        if (count($parts) < 2) {
+            return [
+                'command_name' => $parts[0],
+                'params' => [],
+            ];
+        }
+        [$command_name, $param_string] = $parts;
+        $params = [];
+        foreach (explode('&', $param_string) as $param) {
+            $key_value = explode('=', $param, 2);
+            if (count($key_value) < 2) {
+                continue;
+            }
+            [$key, $value] = $key_value;
+            $params[$key] = $value;
+        }
 
         return [
             'command_name' => $command_name,

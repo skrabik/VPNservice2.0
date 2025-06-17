@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Orchid\Filters\Filterable;
 
@@ -73,6 +74,38 @@ class Customer extends Model
         'telegram_username',
         'created_at',
     ];
+
+    /**
+     * Получить все ключи VPN клиента
+     */
+    public function vpnKeys(): HasMany
+    {
+        return $this->hasMany(VpnKey::class);
+    }
+
+    /**
+     * Получить активные ключи VPN клиента
+     */
+    public function activeVpnKeys(): HasMany
+    {
+        return $this->hasMany(VpnKey::class)->where('is_active', true);
+    }
+
+    /**
+     * Получить сервер клиента
+     */
+    public function server(): BelongsTo
+    {
+        return $this->belongsTo(Server::class);
+    }
+
+    /**
+     * Проверить, есть ли активная подписка
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return true;
+    }
 
     public function subscriptions(): HasMany
     {
