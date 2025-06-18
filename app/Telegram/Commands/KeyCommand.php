@@ -49,7 +49,7 @@ class KeyCommand extends BaseCommand
             $keyboard[] = [
                 [
                     'text' => "🌐 {$server->hostname}",
-                    'callback_data' => "key?server_id={$server->id}",
+                    'callback_data' => "/key?server_id={$server->id}",
                 ],
             ];
         }
@@ -68,36 +68,41 @@ class KeyCommand extends BaseCommand
         ]);
     }
 
-    private function createKeyForServer(int $serverId): void
+    private function createKeyForServer(int $server_id): void
     {
-        $server = Server::find($serverId);
+        $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+
+        Telegram::editMessageText([
+            'chat_id' => $this->customer->telegram_id,
+            'message_id' => $message_id,
+            'text' => '⏳ Создаю ключ VPN...',
+            'parse_mode' => 'HTML',
+        ]);
+
+        $server = Server::find($server_id);
 
         if (! $server) {
-            $message = "❌ Сервер недоступен.\n\n".
-                      'Пожалуйста, выберите другой сервер или обратитесь к администратору.';
-
-            Telegram::sendMessage([
+            Telegram::editMessageText([
                 'chat_id' => $this->customer->telegram_id,
-                'text' => $message,
+                'message_id' => $message_id,
+                'text' => "❌ Сервер недоступен.\n\nПожалуйста, выберите другой сервер или обратитесь к администратору.",
                 'parse_mode' => 'HTML',
             ]);
 
             return;
         }
 
-        $outlineService = new OutlineService($server);
+        $outline_service = new OutlineService($server);
 
         $password = $this->customer->telegram_id.'_'.time();
 
-        $user = $outlineService->createUser($password);
+        $user = $outline_service->createUser($password);
 
         if (! $user) {
-            $message = "❌ Произошла ошибка при создании ключа VPN.\n\n".
-                      'Пожалуйста, попробуйте позже или обратитесь к администратору.';
-
-            Telegram::sendMessage([
+            Telegram::editMessageText([
                 'chat_id' => $this->customer->telegram_id,
-                'text' => $message,
+                'message_id' => $message_id,
+                'text' => "❌ Произошла ошибка при создании ключа VPN.\n\nПожалуйста, попробуйте позже или обратитесь к администратору.",
                 'parse_mode' => 'HTML',
             ]);
 
@@ -106,7 +111,7 @@ class KeyCommand extends BaseCommand
 
         VpnKey::create([
             'customer_id' => $this->customer->id,
-            'server_id' => $serverId,
+            'server_id' => $server_id,
             'server_user_id' => $user['id'],
             'access_key' => $user['accessUrl'],
             'server_type' => $server->type,
@@ -118,11 +123,12 @@ class KeyCommand extends BaseCommand
                   '⚠️ Храните его в безопасном месте и не передавайте третьим лицам.';
 
         $keyboard = [
-            ['Назад'],
+            ['⬅️ Назад'],
         ];
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
+            'message_id' => $message_id,
             'text' => $message,
             'parse_mode' => 'HTML',
             'reply_markup' => json_encode([
