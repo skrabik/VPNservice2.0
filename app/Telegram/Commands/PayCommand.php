@@ -12,8 +12,10 @@ class PayCommand extends BaseCommand
     public function handle(): void
     {
         if ($this->customer->hasActiveSubscription()) {
+            $subscription = $this->customer->subscriptions()->latest()->first();
+
             $message = "✅ У вас уже есть активная подписка!\n\n".
-                "Дата окончания: {$this->customer->subscription_end_date}\n\n".
+                "Дата окончания: {$subscription->date_end}\n\n".
                 'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
 
             $keyboard = [

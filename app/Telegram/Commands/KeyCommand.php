@@ -133,6 +133,10 @@ class KeyCommand extends BaseCommand
             return;
         }
 
+        // удаляем все прошлые ключи
+        $this->deleteActiveKeys();
+
+        // создаем новый ключ
         $outline_service = new OutlineService($server);
 
         $password = $this->customer->telegram_id.'_'.time();
@@ -178,5 +182,21 @@ class KeyCommand extends BaseCommand
                 'one_time_keyboard' => false,
             ]),
         ]);
+    }
+
+    private function deleteActiveKeys(): void
+    {
+        $keys = VpnKey::where('customer_id', $this->customer->id)->get();
+
+        foreach ($keys as $key) {
+            $server = Server::find($key->server_id);
+
+            if ($server) {
+                $outline_service = new OutlineService($server);
+                $outline_service->deleteUser($key->server_user_id);
+            }
+
+            $key->delete();
+        }
     }
 }
