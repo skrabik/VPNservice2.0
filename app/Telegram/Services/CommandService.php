@@ -33,6 +33,7 @@ class CommandService
             '/start' => Commands\StartCommand::class,
             '/key', '🔑 Получить ключ' => Commands\KeyCommand::class,
             '/pay' => Commands\PayCommand::class,
+            '/instructions', '📱 Инструкции по подключению', 'instructions' => Commands\InstructionsCommand::class,
             default => Commands\HelpCommand::class,
         };
     }
