@@ -4,38 +4,35 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
-    libonig-dev \
     libxml2-dev \
-    libzip-dev \
-    libpq-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip
+    libpq-dev \
+    libonig-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libzip-dev \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+    pdo \
+    pdo_pgsql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    xml
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
-
-COPY . /var/www
-
-RUN composer install --optimize-autoloader
-
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install \
-    && npm run build
-
-RUN if [ ! -f .env ]; then \
-    cp .env.example .env; \
-    fi \
-    && php artisan key:generate --force
-
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
-
-RUN ln -sf /var/www/storage/app/public /var/www/public/storage
+RUN groupadd -g 1000 www \
+    && useradd -u 1000 -ms /bin/bash -g www www
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["php-fpm"] 

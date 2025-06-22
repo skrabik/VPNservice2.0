@@ -3,32 +3,39 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app
+    container_name: vpnservice_app
     restart: unless-stopped
-    working_dir: /var/www
-    ports: []
+    working_dir: /var/www/
     volumes:
-      - ./storage:/var/www/storage
-      - ./bootstrap/cache:/var/www/bootstrap/cache
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - network
+      - vpnservice_network
     depends_on:
       - postgres
-    environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_DATABASE=vpnservice
-      - DB_USERNAME=vpnservice_user
-      - DB_PASSWORD=vpnservice_password
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_URL=${APP_URL}
-      - APP_KEY=${APP_KEY}
+    healthcheck:
+      test: [ "CMD", "php-fpm", "-t" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx
+    container_name: vpnservice_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - vpnservice_network
+    depends_on:
+      - app
 
   postgres:
-    image: postgres:17-alpine
-    container_name: postgres
+    image: postgres:17
+    container_name: vpnservice_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: vpnservice
@@ -40,27 +47,12 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - network
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./public:/var/www/public
-    depends_on:
-      - app
-    networks:
-      - network
+      - vpnservice_network
 
 volumes:
   postgres_data:
-
+    driver: local
 
 networks:
-  network:
+  vpnservice_network:
     driver: bridge
