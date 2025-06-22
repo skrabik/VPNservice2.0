@@ -20,11 +20,15 @@ COPY . /var/www
 
 RUN composer install --optimize-autoloader
 
-# Установка Node.js и сборка фронтенда
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && npm install \
     && npm run build
+
+RUN if [ ! -f .env ]; then \
+    cp .env.example .env; \
+    fi \
+    && php artisan key:generate --force
 
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
