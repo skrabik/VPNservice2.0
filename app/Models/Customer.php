@@ -104,7 +104,9 @@ class Customer extends Model
      */
     public function hasActiveSubscription(): bool
     {
-        return true;
+        return $this->subscriptions()
+            ->where('date_end', '>', now())
+            ->exists();
     }
 
     public function subscriptions(): HasMany

@@ -32,7 +32,8 @@ class CommandService
         return match ($command_name) {
             '/start' => Commands\StartCommand::class,
             '/key', '🔑 Получить ключ' => Commands\KeyCommand::class,
-            '/pay' => Commands\PayCommand::class,
+            '/plan', '💳 Выбрать тариф' => Commands\PlanCommand::class,
+            '/pay', '💳 Оплатить подписку' => Commands\PayCommand::class,
             '/instructions', '📱 Инструкции по подключению' => Commands\InstructionsCommand::class,
             default => Commands\HelpCommand::class,
         };

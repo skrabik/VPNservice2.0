@@ -8,12 +8,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subscription extends Model
 {
+    protected $fillable = [
+        'customer_id',
+        'plan_id',
+        'date_start',
+        'date_end',
+    ];
+
+    protected $casts = [
+        'date_start' => 'datetime',
+        'date_end' => 'datetime',
+    ];
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
 
-    public function customers(): BelongsTo
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }

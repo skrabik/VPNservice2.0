@@ -18,6 +18,38 @@ class KeyCommand extends BaseCommand
 
     public function handle(): void
     {
+        // Отвечаем на callback query чтобы убрать "часики" у кнопки
+        if ($this->update->getCallbackQuery()) {
+            Telegram::answerCallbackQuery([
+                'callback_query_id' => $this->update->getCallbackQuery()->getId(),
+                'show_alert' => false,
+            ]);
+        }
+
+        if (! $this->customer->hasActiveSubscription()) {
+            $message = "❌ У вас нет активной подписки!\n\n".
+                "Для создания ключей VPN необходимо оформить подписку.\n\n".
+                'Нажмите кнопку ниже, чтобы перейти к оплате.';
+
+            $keyboard = [
+                ['💳 Выбрать тариф'],
+                ['❓ Помощь'],
+            ];
+
+            Telegram::sendMessage([
+                'chat_id' => $this->customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'keyboard' => $keyboard,
+                    'resize_keyboard' => true,
+                    'one_time_keyboard' => false,
+                ]),
+            ]);
+
+            return;
+        }
+
         if (isset($this->params['server_id'])) {
             $this->createKeyForServer($this->params['server_id']);
 
@@ -33,7 +65,7 @@ class KeyCommand extends BaseCommand
 
         if ($servers->isEmpty()) {
             $message = "❌ Нет доступных серверов.\n\n".
-                      'Пожалуйста, попробуйте позже или обратитесь к администратору.';
+                'Пожалуйста, попробуйте позже или обратитесь к администратору.';
 
             Telegram::sendMessage([
                 'chat_id' => $this->customer->telegram_id,
@@ -57,6 +89,15 @@ class KeyCommand extends BaseCommand
         $keyboard[] = [['text' => '⬅️ Назад', 'callback_data' => 'start']];
 
         $message = '🔑 Выберите сервер для создания ключа VPN:';
+
+        // Удаляем предыдущее сообщение если это callback
+        if ($this->update->getCallbackQuery()) {
+            $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+            Telegram::deleteMessage([
+                'chat_id' => $this->customer->telegram_id,
+                'message_id' => $message_id,
+            ]);
+        }
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
@@ -119,8 +160,8 @@ class KeyCommand extends BaseCommand
         ]);
 
         $message = "🔑 Ваш новый ключ VPN для сервера {$server->name}:\n\n".
-                  "<code>{$user['accessUrl']}</code>\n\n".
-                  '⚠️ Храните его в безопасном месте и не передавайте третьим лицам.';
+            "<code>{$user['accessUrl']}</code>\n\n".
+            '⚠️ Храните его в безопасном месте и не передавайте третьим лицам.';
 
         $keyboard = [
             ['⬅️ Назад'],
