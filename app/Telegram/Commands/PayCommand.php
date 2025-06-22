@@ -11,6 +11,27 @@ class PayCommand extends BaseCommand
 {
     public function handle(): void
     {
+        if ($this->customer->hasActiveSubscription()) {
+            $message = "✅ У вас уже есть активная подписка!\n\n".
+                "Дата окончания: {$this->customer->subscription_end_date}\n\n".
+                'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
+
+            $keyboard = [
+                [['text' => '❓ Помощь', 'callback_data' => 'help']],
+            ];
+
+            Telegram::sendMessage([
+                'chat_id' => $this->customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => $keyboard,
+                ]),
+            ]);
+
+            return;
+        }
+
         if (isset($this->params['payment_method_id']) && isset($this->params['plan_id'])) {
             $this->processPayment($this->params['plan_id'], $this->params['payment_method_id']);
 
