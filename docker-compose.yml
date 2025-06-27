@@ -24,10 +24,12 @@ services:
     container_name: vpnservice_nginx
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - vpnservice_network
     depends_on:
