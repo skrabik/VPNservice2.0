@@ -6,7 +6,7 @@ namespace App\Orchid\Screens\Server;
 
 use App\Models\Server;
 use App\Orchid\Layouts\Server\ServerEditLayout;
-use App\Orchid\Layouts\Server\ServerParameterLayout;
+use App\Orchid\Layouts\Server\ServerParameterEditLayout;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -31,6 +31,7 @@ class ServerEditScreen extends Screen
         return [
             'server' => $server,
             'parameters' => $server->parameters,
+            'server_parameters' => $server->parameters,
         ];
     }
 
@@ -92,14 +93,40 @@ class ServerEditScreen extends Screen
                         ->method('save')
                 ),
 
-            Layout::block(ServerParameterLayout::class)
-                ->title('Server parameters'),
+            Layout::block(ServerParameterEditLayout::class)
+                ->title('Server Parameters')
+                ->description('Update server parameters.')
+                ->commands(
+                    Button::make('Save')
+                        ->type(Color::BASIC)
+                        ->icon('bs.check-circle')
+                        ->method('save')
+                ),
         ];
     }
 
     public function save(Server $server, Request $request)
     {
         $server->fill($request->get('server'))->save();
+
+        if ($request->has('server_parameters')) {
+            foreach ($request->get('server_parameters') as $parameterId => $parameterData) {
+                $parameter = $server->parameters()->find($parameterId);
+                if ($parameter) {
+                    $parameter->update(['value' => $parameterData['value']]);
+                }
+            }
+        }
+
+        if ($request->has('new_server_parameters')) {
+            foreach ($request->get('new_server_parameters') as $parameterKey => $parameterValue) {
+                $server->parameters()->create([
+                    'key' => $parameterKey,
+                    'value' => $parameterValue,
+                ]);
+            }
+        }
+
         Toast::info('Server was saved.');
 
         return redirect()->route('platform.servers');
