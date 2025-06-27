@@ -18,6 +18,17 @@ class ServerParameter extends Model
         'value',
     ];
 
+    public const SERVER_PARAMETER_URL_KEY = 'url';
+
+    public const SERVER_TYPES_PARAMETERS = [
+        Server::SERVER_TYPE_OUTLINE_KEY => [
+            self::SERVER_PARAMETER_URL_KEY,
+        ],
+        Server::SERVER_TYPE_OPENVPN_KEY => [
+            self::SERVER_PARAMETER_URL_KEY,
+        ],
+    ];
+
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
