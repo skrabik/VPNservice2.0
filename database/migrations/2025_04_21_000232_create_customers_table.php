@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name', 256);
             $table->string('last_name', 256)->nullable();
-            $table->string('email', 256)->unique();
+            $table->string('email', 256)->unique()->nullable();
             $table->string('password', 256)->nullable();
             $table->string('telegram_id', 256)->nullable();
             $table->string('telegram_username', 256)->nullable();
