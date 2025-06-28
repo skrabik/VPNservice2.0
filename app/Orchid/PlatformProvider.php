@@ -30,12 +30,12 @@ class PlatformProvider extends OrchidServiceProvider
     {
         return [
             Menu::make(__('Notifications'))
-                ->icon('icon-comment')
+                ->icon('bs.info-circle')
                 ->route('platform.notifications')
                 ->permission('platform.notifications'),
 
             Menu::make(__('Customers'))
-                ->icon('icon-comment')
+                ->icon('bs.person-arms-up')
                 ->route('platform.customers')
                 ->permission('platform.customers'),
 

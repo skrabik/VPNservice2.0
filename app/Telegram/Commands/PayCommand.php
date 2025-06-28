@@ -50,7 +50,7 @@ class PayCommand extends BaseCommand
 
     private function showPlans(): void
     {
-        $plans = Plan::all();
+        $plans = Plan::where('active', true)->get();
 
         if ($plans->isEmpty()) {
             $message = "❌ Нет доступных тарифов.\n\n".
@@ -103,9 +103,9 @@ class PayCommand extends BaseCommand
             return;
         }
 
-        $paymentMethods = PaymentMethod::where('active', true)->get();
+        $payment_methods = PaymentMethod::where('active', true)->get();
 
-        if ($paymentMethods->isEmpty()) {
+        if ($payment_methods->isEmpty()) {
             Telegram::sendMessage([
                 'chat_id' => $this->customer->telegram_id,
                 'text' => "❌ Нет доступных методов оплаты.\n\nПожалуйста, попробуйте позже или обратитесь к администратору.",
@@ -119,7 +119,7 @@ class PayCommand extends BaseCommand
             "💰 Сумма к оплате: <b>{$plan->price}₽ ({$plan->stars}🌟)</b>\n\n";
 
         $keyboard = [];
-        foreach ($paymentMethods as $method) {
+        foreach ($payment_methods as $method) {
             $keyboard[] = [
                 [
                     'text' => "💳 {$method->title}",
@@ -151,9 +151,9 @@ class PayCommand extends BaseCommand
     private function processPayment(int $plan_id, int $payment_method_id): void
     {
         $plan = Plan::find($plan_id);
-        $paymentMethod = PaymentMethod::find($payment_method_id);
+        $payment_method = PaymentMethod::find($payment_method_id);
 
-        if (! $plan || ! $paymentMethod) {
+        if (! $plan || ! $payment_method) {
             Telegram::sendMessage([
                 'chat_id' => $this->customer->telegram_id,
                 'text' => '❌ Ошибка: тариф или метод оплаты не найден.',
@@ -176,7 +176,10 @@ class PayCommand extends BaseCommand
             'chat_id' => $this->customer->telegram_id,
             'title' => 'Тариф: '.$plan->title,
             'description' => 'Подписка: '.$plan->description.' на '.$plan->period.' дней',
-            'payload' => $plan->id,
+            'payload' => json_encode([
+                'plan_id' => $plan->id, 
+                'payment_method_id' => $payment_method->id
+            ]),
             'currency' => 'XTR',
             'prices' => [
                 ['label' => $plan->title, 'amount' => $plan->stars],

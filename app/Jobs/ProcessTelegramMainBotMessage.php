@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Telegram\Services\CommandService;
+use App\Telegram\Services\PreCheckoutQueryService;
+use App\Telegram\Services\SuccessfulPaymentService;
 use App\Telegram\TelegramManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -55,6 +57,18 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                     'last_name' => $from->getLastName(),
                 ]);
                 Log::info('Created new customer', ['customer_id' => $customer->id]);
+            }
+
+            if ($update->getPreCheckoutQuery()) {
+                PreCheckoutQueryService::process($update, $customer);
+
+                return;
+            }
+
+            if ($update->getMessage()->getSuccessfulPayment()) {
+                SuccessfulPaymentService::process($update, $customer);
+
+                return;
             }
 
             CommandService::process($update, $customer);

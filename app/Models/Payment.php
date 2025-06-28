@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
+    protected $fillable = [
+        'customer_id',
+        'subscription_id',
+        'amount',
+        'currency',
+        'transaction_id',
+        'payment_method_id',
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Orchid\Layouts\Plan;
 
 use Orchid\Screen\Field;
+use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Switcher;
 use Orchid\Screen\Layouts\Rows;
 
 class PlanEditLayout extends Rows
@@ -37,6 +37,11 @@ class PlanEditLayout extends Rows
                 ->title('Description')
                 ->placeholder('Enter description'),
 
+            Input::make('plan.stars')
+                ->type('inteteger')
+                ->reuquired()
+                ->title('Stars'),
+
             Input::make('plan.price')
                 ->type('number')
                 ->step('0.01')
@@ -48,7 +53,9 @@ class PlanEditLayout extends Rows
                 ->required()
                 ->title('Period (days)'),
 
-            Switcher::make('plan.active')
+            CheckBox::make('plan.active')
+                ->sendTrueOrFalse()
+                ->checked()
                 ->title('Active'),
         ];
     }

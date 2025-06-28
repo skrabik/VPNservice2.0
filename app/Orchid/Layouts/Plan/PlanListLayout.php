@@ -26,6 +26,7 @@ class PlanListLayout extends Table
             TD::make('title', 'Title')->sort()->filter(),
             TD::make('slug', 'Slug')->sort()->filter(),
             TD::make('price', 'Price')->sort()->filter(),
+            TD::make('stars', 'Stars')->sort()->filter(),
             TD::make('period', 'Period (days)')->sort()->filter(),
             TD::make('active', 'Active')->render(fn (Plan $plan) => $plan->active ? 'Yes' : 'No'),
             TD::make('created_at', 'Created At')->render(fn (Plan $plan) => optional($plan->created_at)->format('d.m.Y H:i')),
