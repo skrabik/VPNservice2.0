@@ -6,7 +6,7 @@ namespace App\Orchid\Layouts\Server;
 
 use App\Models\Server;
 use Orchid\Screen\Field;
-use Orchid\Screen\Fields\Checkbox;
+use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Layouts\Rows;
@@ -54,7 +54,7 @@ class ServerEditLayout extends Rows
                 ->title('Location')
                 ->placeholder('Enter server location'),
 
-            Checkbox::make('server.active')
+            CheckBox::make('server.active')
                 ->sendTrueOrFalse()
                 ->title('Active')
                 ->help('Enable or disable server'),
