@@ -32,29 +32,31 @@ class StatusCommand extends BaseCommand
             return;
         }
 
-        $daysLeft = now()->diffInDays($subscription->date_end, false);
-        $hoursLeft = now()->diffInHours($subscription->date_end, false) % 24;
+        $days_left = now()->diffInDays($subscription->date_end, false);
+        $hours_left = now()->diffInHours($subscription->date_end, false) % 24;
 
-        $statusIcon = $daysLeft > 7 ? '✅' : ($daysLeft > 3 ? '⚠️' : '🔴');
-        $statusText = $daysLeft > 7 ? 'Активна' : ($daysLeft > 3 ? 'Заканчивается' : 'Истекает');
+        $days_left = round($days_left);
+
+        $status_icon = $days_left > 7 ? '✅' : ($days_left > 3 ? '⚠️' : '🔴');
+        $status_text = $days_left > 7 ? 'Активна' : ($days_left > 3 ? 'Заканчивается' : 'Истекает');
 
         $message = "📊 <b>Статус подписки</b>\n\n".
-            "{$statusIcon} Статус: <b>{$statusText}</b>\n".
+            "{$status_icon} Статус: <b>{$status_text}</b>\n".
             "📋 Тариф: <b>{$subscription->plan->title}</b>\n".
             "💰 Стоимость: <b>{$subscription->plan->price}₽</b>\n".
             "📅 Дата начала: <b>{$subscription->date_start->format('d.m.Y')}</b>\n".
             "📅 Дата окончания: <b>{$subscription->date_end->format('d.m.Y H:i')}</b>\n\n";
 
-        if ($daysLeft > 0) {
-            $message .= "⏰ Осталось: <b>{$daysLeft} дн. {$hoursLeft} ч.</b>\n\n";
+        if ($days_left > 0) {
+            $message .= "⏰ Осталось: <b>{$days_left} дн. {$hours_left} ч.</b>\n\n";
         } else {
             $message .= "⏰ Подписка истекла\n\n";
         }
 
-        $activeKeys = $this->customer->activeVpnKeys()->count();
-        $message .= "🔑 Активных ключей VPN: <b>{$activeKeys}</b>\n\n";
+        $active_keys = $this->customer->activeVpnKeys()->count();
+        $message .= "🔑 Активных ключей VPN: <b>{$active_keys}</b>\n\n";
 
-        if ($daysLeft > 0) {
+        if ($days_left > 0) {
             $message .= '💡 Вы можете получить ключи VPN или продлить подписку.';
         } else {
             $message .= '💡 Для продолжения работы необходимо продлить подписку.';
@@ -62,11 +64,11 @@ class StatusCommand extends BaseCommand
 
         $keyboard = [];
 
-        if ($daysLeft > 0) {
+        if ($days_left > 0) {
             $keyboard[] = [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']];
         }
 
-        if ($daysLeft <= 7) {
+        if ($days_left <= 7) {
             $keyboard[] = [['text' => '💳 Продлить подписку', 'callback_data' => '/pay']];
         }
 

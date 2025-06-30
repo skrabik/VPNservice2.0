@@ -177,8 +177,8 @@ class PayCommand extends BaseCommand
             'title' => 'Тариф: '.$plan->title,
             'description' => 'Подписка: '.$plan->description.' на '.$plan->period.' дней',
             'payload' => json_encode([
-                'plan_id' => $plan->id, 
-                'payment_method_id' => $payment_method->id
+                'plan_id' => $plan->id,
+                'payment_method_id' => $payment_method->id,
             ]),
             'currency' => 'XTR',
             'prices' => [

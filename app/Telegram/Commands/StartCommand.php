@@ -12,11 +12,9 @@ class StartCommand extends BaseCommand
             'Выберите нужную опцию:';
 
         $keyboard = [
-            [['text' => '📊 Статус подписки', 'callback_data' => '/status']],
-            [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']],
-            [['text' => '💳 Оплатить подписку', 'callback_data' => '/pay']],
-            [['text' => '📱 Инструкции по подключению', 'callback_data' => '/instructions']],
-            [['text' => '❓ Помощь', 'callback_data' => 'help']],
+            ['🔑 Получить ключ', '📱 Инструкции по подключению'],
+            ['💳 Оплатить подписку', '📊 Статус подписки'],
+            ['🎁 Ввести промокод', '❓ Помощь'],
         ];
 
         Telegram::sendMessage([

@@ -3,8 +3,8 @@
 namespace App\Telegram\Services;
 
 use App\Models\Customer;
-use App\Models\Plan;
 use App\Models\PaymentMethod;
+use App\Models\Plan;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
