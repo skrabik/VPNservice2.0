@@ -26,13 +26,12 @@ class Server extends Model
     ];
 
     protected $fillable = [
-        'name',
-        'type',
-        'host',
-        'port',
-        'username',
-        'password',
+        'hostname',
+        'ip_address',
+        'location',
         'active',
+        'max_users',
+        'type',
     ];
 
     protected $casts = [
