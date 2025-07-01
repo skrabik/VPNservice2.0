@@ -37,7 +37,7 @@ class HelpCommand extends BaseCommand
             'reply_markup' => json_encode([
                 'keyboard' => $keyboard,
                 'resize_keyboard' => true,
-                'one_time_keyboard' => true,
+                'one_time_keyboard' => false,
             ]),
         ]);
     }
