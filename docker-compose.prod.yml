@@ -28,7 +28,7 @@ services:
       - "443:443"
     volumes:
       - ./:/var/www
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./docker/nginx/conf.prod.d/:/etc/nginx/conf.d/
       - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - vpnservice_network
