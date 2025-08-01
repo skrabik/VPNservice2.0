@@ -2,12 +2,19 @@
 
 namespace App\Telegram\Commands;
 
+use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class StatusCommand extends BaseCommand
 {
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /status',
+            'action' => 'Вызвал команду /status',
+        ]);
+
         $subscription = $this->customer->subscriptions()->latest()->first();
 
         if (! $subscription || $subscription->date_end < now()) {

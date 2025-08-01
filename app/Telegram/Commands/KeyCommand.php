@@ -4,6 +4,7 @@ namespace App\Telegram\Commands;
 
 use App\Models\Customer;
 use App\Models\Server;
+use App\Models\TelegramCommandLog;
 use App\Models\VpnKey;
 use App\Services\OutlineService;
 use Telegram\Bot\Laravel\Facades\Telegram;
@@ -18,6 +19,12 @@ class KeyCommand extends BaseCommand
 
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /key',
+            'action' => 'Вызвал команду /key',
+        ]);
+
         if (! $this->customer->hasActiveSubscription()) {
             $message = "❌ У вас нет активной подписки!\n\n".
                 "Для создания ключей VPN необходимо оформить подписку.\n\n".

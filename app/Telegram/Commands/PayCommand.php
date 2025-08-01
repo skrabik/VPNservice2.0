@@ -4,12 +4,19 @@ namespace App\Telegram\Commands;
 
 use App\Models\PaymentMethod;
 use App\Models\Plan;
+use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class PayCommand extends BaseCommand
 {
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /pay',
+            'action' => 'Вызвал команду /pay',
+        ]);
+
         if ($this->customer->hasActiveSubscription()) {
             $subscription = $this->customer->subscriptions()->latest()->first();
 
@@ -34,12 +41,24 @@ class PayCommand extends BaseCommand
         }
 
         if (isset($this->params['payment_method_id']) && isset($this->params['plan_id'])) {
+            TelegramCommandLog::create([
+                'customer_id' => $this->customer->id,
+                'command_name' => 'процессим платеж',
+                'action' => 'process_payment',
+            ]);
+
             $this->processPayment($this->params['plan_id'], $this->params['payment_method_id']);
 
             return;
         }
 
         if (isset($this->params['plan_id'])) {
+            TelegramCommandLog::create([
+                'customer_id' => $this->customer->id,
+                'command_name' => 'показываем платёжные методы',
+                'action' => 'show_payment_methods',
+            ]);
+
             $this->showPaymentMethods($this->params['plan_id']);
 
             return;

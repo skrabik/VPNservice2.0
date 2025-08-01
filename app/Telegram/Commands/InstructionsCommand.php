@@ -2,12 +2,19 @@
 
 namespace App\Telegram\Commands;
 
+use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class InstructionsCommand extends BaseCommand
 {
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /instructions',
+            'action' => 'Вызвал команду /instructions',
+        ]);
+
         // Проверяем параметры из callback_data
         if (isset($this->params['instruction_type'])) {
             $this->sendSpecificInstruction($this->params['instruction_type']);

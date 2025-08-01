@@ -3,6 +3,7 @@
 namespace App\Telegram\Commands;
 
 use App\Models\Customer;
+use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
 
@@ -15,6 +16,12 @@ class HelpCommand extends BaseCommand
 
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /help',
+            'action' => 'Вызвал команду /help',
+        ]);
+
         $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
                   "Доступные команды:\n\n".
                   "🔑 /key - Получить ключ VPN\n".

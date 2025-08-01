@@ -13,11 +13,11 @@ use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerEditScreen;
 use App\Orchid\Screens\Server\ServerListScreen;
+use App\Orchid\Screens\TelegramCommandLogScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
 use Illuminate\Support\Facades\Route;
-use Orchid\Support\Facades\Dashboard;
 use Tabuna\Breadcrumbs\Trail;
 
 /*
@@ -159,3 +159,9 @@ Route::prefix('servers')->group(function () {
             ->parent('platform.servers')
             ->push(__('Edit'), route('platform.servers.edit', $server)));
 });
+
+Route::screen('command-logs', TelegramCommandLogScreen::class)
+    ->name('platform.command-logs')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push(__('Telegram Logs'), route('platform.command-logs')));

@@ -5,6 +5,7 @@ namespace App\Telegram\Commands;
 use App\Models\Customer;
 use App\Models\Plan;
 use App\Models\Subscription;
+use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
 
@@ -17,6 +18,12 @@ class PromoCommand extends BaseCommand
 
     public function handle(): void
     {
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'Вызвал команду /promo',
+            'action' => 'Вызвал команду /promo',
+        ]);
+
         $message = trim($this->update->getMessage()->getText());
 
         if ($message === '/promo' || $message === '🎁 Ввести промокод') {

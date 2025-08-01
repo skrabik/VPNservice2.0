@@ -69,6 +69,7 @@ class CustomerEditScreen extends Screen
                 ->icon('bs.trash3')
                 ->confirm(__('Are you sure you want to delete this customer?'))
                 ->method('remove')
+                ->novalidate()
                 ->canSee($this->customer->exists),
 
             Button::make(__('Save'))
