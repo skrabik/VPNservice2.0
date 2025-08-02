@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Models\Customer;
+use App\Models\CustomerPendingAction;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
 use App\Telegram\Services\SuccessfulPaymentService;
+use App\Telegram\Services\SupportTicketService;
 use App\Telegram\TelegramManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -69,6 +71,21 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 SuccessfulPaymentService::process($update, $customer);
 
                 return;
+            }
+
+            if ($customer->pending_actions()->exists()) {
+                $pendingAction = $customer->pending_actions()->first();
+
+                if ($pendingAction->action_id === CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE &&
+                    $message->getText() != '❌ Отмена'
+                ) {
+                    SupportTicketService::process($update, $customer);
+                    $customer->pending_actions()->delete();
+
+                    return;
+                }
+
+                $customer->pending_actions()->delete();
             }
 
             CommandService::process($update, $customer);

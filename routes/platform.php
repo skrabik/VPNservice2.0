@@ -13,6 +13,7 @@ use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerEditScreen;
 use App\Orchid\Screens\Server\ServerListScreen;
+use App\Orchid\Screens\SupportTicketScreen;
 use App\Orchid\Screens\TelegramCommandLogScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
@@ -165,3 +166,9 @@ Route::screen('command-logs', TelegramCommandLogScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Telegram Logs'), route('platform.command-logs')));
+
+Route::screen('support-tickets', SupportTicketScreen::class)
+    ->name('platform.support-tickets')
+    ->breadcrumbs(fn (Trail $trail) => $trail
+        ->parent('platform.index')
+        ->push(__('Support Tickets'), route('platform.support-tickets')));

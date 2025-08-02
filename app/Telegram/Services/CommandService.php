@@ -41,6 +41,7 @@ class CommandService
             '/status', '📊 Статус подписки' => Commands\StatusCommand::class,
             '/instructions', '📱 Инструкции по подключению' => Commands\InstructionsCommand::class,
             '/promo', '🎁 Ввести промокод' => Commands\PromoCommand::class,
+            '/support', '📝 Поддержка' => Commands\SupportCommand::class,
             default => Commands\HelpCommand::class,
         };
     }

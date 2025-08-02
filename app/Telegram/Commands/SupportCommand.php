@@ -2,27 +2,29 @@
 
 namespace App\Telegram\Commands;
 
+use App\Models\CustomerPendingAction;
 use App\Models\TelegramCommandLog;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
-class StartCommand extends BaseCommand
+class SupportCommand extends BaseCommand
 {
     public function handle(): void
     {
         TelegramCommandLog::create([
             'customer_id' => $this->customer->id,
-            'command_name' => 'start',
-            'action' => 'start',
+            'command_name' => 'support',
+            'action' => 'Создание тикета поддержки',
         ]);
 
-        $message = "👋 Добро пожаловать в VPN сервис!\n\n".
-            'Выберите нужную опцию:';
+        $this->customer->pending_actions()->create([
+            'action_id' => CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE,
+        ]);
+
+        $message = "📝 <b>Создание тикета поддержки</b>\n\n".
+                  'Пожалуйста, введите ваше сообщение:';
 
         $keyboard = [
-            ['🔑 Получить ключ', '📱 Инструкции по подключению'],
-            ['💳 Оплатить подписку', '📊 Статус подписки'],
-            ['🎁 Ввести промокод', '📝 Поддержка'],
-            ['❓ Помощь'],
+            ['❌ Отмена'],
         ];
 
         Telegram::sendMessage([

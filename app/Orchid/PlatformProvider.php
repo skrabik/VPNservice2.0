@@ -71,6 +71,11 @@ class PlatformProvider extends OrchidServiceProvider
                 ->icon('bs.chat-dots')
                 ->route('platform.command-logs')
                 ->permission('platform.command-logs'),
+
+            Menu::make(__('Support Tickets'))
+                ->icon('bs.ticket')
+                ->route('platform.support-tickets')
+                ->permission('platform.support-tickets'),
         ];
     }
 
@@ -92,7 +97,8 @@ class PlatformProvider extends OrchidServiceProvider
                 ->addPermission('platform.customers', __('Customers'))
                 ->addPermission('platform.plans', __('Plans'))
                 ->addPermission('platform.payment_methods', __('Payment Methods'))
-                ->addPermission('platform.command-logs', __('Telegram Logs')),
+                ->addPermission('platform.command-logs', __('Telegram Logs'))
+                ->addPermission('platform.support-tickets', __('Support Tickets')),
         ];
     }
 }

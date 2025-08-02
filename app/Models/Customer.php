@@ -118,4 +118,9 @@ class Customer extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function pending_actions(): HasMany
+    {
+        return $this->hasMany(CustomerPendingAction::class);
+    }
 }
