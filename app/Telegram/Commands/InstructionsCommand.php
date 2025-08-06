@@ -52,11 +52,7 @@ class InstructionsCommand extends BaseCommand
 
         $keyboard = [
             [
-                ['text' => '📱 Outline (Shadowsocks)', 'callback_data' => '/instructions?instruction_type=outline'],
-                ['text' => '🔒 OpenVPN', 'callback_data' => '/instructions?instruction_type=openvpn'],
-            ],
-            [
-                ['text' => '⚡ Xray (V2Ray)', 'callback_data' => '/instructions?instruction_type=xray'],
+                ['text' => '📱 Outline', 'callback_data' => '/instructions?instruction_type=outline'],
             ],
             [
                 ['text' => '⬅️ Назад', 'callback_data' => '/help'],
