@@ -4,6 +4,11 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Models\CustomerPendingAction;
+use App\Models\Plan;
+use App\Models\Server;
+use App\Models\Subscription;
+use App\Models\VpnKey;
+use App\Services\OutlineService;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
 use App\Telegram\Services\SuccessfulPaymentService;
@@ -15,6 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
 
 class ProcessTelegramMainBotMessage implements ShouldQueue
@@ -59,6 +65,12 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                     'last_name' => $from->getLastName(),
                 ]);
                 Log::info('Created new customer', ['customer_id' => $customer->id]);
+
+                $this->createWelcomeSubscription($customer);
+
+                $this->createWelcomeVpnKey($customer);
+
+                return;
             }
 
             if ($update->getPreCheckoutQuery()) {
@@ -93,6 +105,96 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
             Log::error('Error processing message', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
+
+    private function createWelcomeSubscription(Customer $customer): void
+    {
+        try {
+            $promo_plan = Plan::where('slug', 'promo')->first();
+
+            if ($promo_plan) {
+                Subscription::create([
+                    'customer_id' => $customer->id,
+                    'plan_id' => $promo_plan->id,
+                    'date_start' => now(),
+                    'date_end' => now()->addDays(7),
+                ]);
+
+                Log::info('Created welcome subscription for new customer', ['customer_id' => $customer->id]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating welcome subscription', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function createWelcomeVpnKey(Customer $customer): void
+    {
+        try {
+            $server = Server::first();
+
+            if ($server) {
+                $outline_service = new OutlineService($server);
+                $password = $customer->telegram_id.'_'.time();
+                $user = $outline_service->createUser($password);
+
+                if ($user) {
+                    VpnKey::create([
+                        'customer_id' => $customer->id,
+                        'server_id' => $server->id,
+                        'server_user_id' => $user['id'],
+                        'access_key' => $user['accessUrl'],
+                        'server_type' => $server->type,
+                        'is_active' => true,
+                    ]);
+
+                    Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
+
+                    $this->sendWelcomeMessage($customer, $user['accessUrl'], $server->name);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating welcome VPN key', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function sendWelcomeMessage(Customer $customer, string $access_url, string $server_name): void
+    {
+        try {
+            $message = "🎉 <b>Добро пожаловать!</b>\n\n".
+                "✅ Вам автоматически предоставлен бесплатный VPN на <b>7 дней</b>\n".
+                "🔑 Ваш ключ VPN для сервера {$server_name}:\n\n".
+                "<code>{$access_url}</code>\n\n".
+                'Качайте приложение для подключения к VPN:';
+
+            $keyboard = [
+                [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=org.outline.android.client']],
+                [['text' => '🪟 Windows', 'url' => 'https://getoutline.org/get-started/step-1']],
+                [['text' => '🍎 iOS', 'url' => 'https://apps.apple.com/us/app/outline-app/id1356177741']],
+                [['text' => '🖥️ macOS', 'url' => 'https://getoutline.org/get-started/step-1']],
+            ];
+
+            Telegram::sendMessage([
+                'chat_id' => $customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => $keyboard,
+                ]),
+            ]);
+
+            Log::info('Sent welcome message to new customer', ['customer_id' => $customer->id]);
+        } catch (\Exception $e) {
+            Log::error('Error sending welcome message', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
             ]);
         }
     }
