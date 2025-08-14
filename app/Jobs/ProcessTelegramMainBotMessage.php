@@ -114,16 +114,27 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         try {
             $promo_plan = Plan::where('slug', 'promo')->first();
 
-            if ($promo_plan) {
-                Subscription::create([
-                    'customer_id' => $customer->id,
-                    'plan_id' => $promo_plan->id,
-                    'date_start' => now(),
-                    'date_end' => now()->addDays(7),
+            if (! $promo_plan) {
+                $promo_plan = Plan::create([
+                    'name' => 'Промо план',
+                    'slug' => 'promo',
+                    'description' => 'Бесплатный план на 7 дней для новых пользователей',
+                    'price' => 0,
+                    'period' => 7,
+                    'is_active' => true,
                 ]);
 
-                Log::info('Created welcome subscription for new customer', ['customer_id' => $customer->id]);
+                Log::info('Created promo plan', ['plan_id' => $promo_plan->id]);
             }
+
+            Subscription::create([
+                'customer_id' => $customer->id,
+                'plan_id' => $promo_plan->id,
+                'date_start' => now(),
+                'date_end' => now()->addDays(7),
+            ]);
+
+            Log::info('Created welcome subscription for new customer', ['customer_id' => $customer->id]);
         } catch (\Exception $e) {
             Log::error('Error creating welcome subscription', [
                 'customer_id' => $customer->id,
@@ -156,7 +167,15 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
                     $this->sendWelcomeMessage($customer, $user['accessUrl'], $server->name);
                 }
+            } else {
+                Log::error('No server found');
+
+                Telegram::sendMessage([
+                    'chat_id' => $customer->telegram_id,
+                    'text' => 'Сервер не найден',
+                ]);
             }
+
         } catch (\Exception $e) {
             Log::error('Error creating welcome VPN key', [
                 'customer_id' => $customer->id,
