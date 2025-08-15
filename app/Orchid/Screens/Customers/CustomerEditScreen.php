@@ -7,6 +7,7 @@ namespace App\Orchid\Screens\Customers;
 use App\Models\Customer;
 use App\Orchid\Layouts\Customer\CustomerEditLayout;
 use App\Orchid\Layouts\Customer\CustomerSubscriptionsLayout;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -122,5 +123,25 @@ class CustomerEditScreen extends Screen
         Toast::info(__('Customer was removed'));
 
         return redirect()->route('platform.customers');
+    }
+
+    /**
+     * @return void
+     */
+    public function deleteSubscription(Customer $customer, Request $request)
+    {
+        $subscription_id = (int) $request->input('subscription_id');
+        $subscription = Subscription::query()
+            ->where('id', $subscription_id)
+            ->where('customer_id', $customer->id)
+            ->first();
+
+        if (!$subscription) {
+            Toast::warning(__('Subscription not found.'));
+            return;
+        }
+
+        $subscription->delete();
+        Toast::info(__('Subscription was deleted.'));
     }
 }
