@@ -165,7 +165,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
                     Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
 
-                    $this->sendWelcomeMessage($customer, $user['accessUrl'], $server->name);
+                    $this->sendWelcomeMessage($customer, $user['accessUrl'], $server->hostname);
                 }
             } else {
                 Log::error('No server found');
@@ -195,9 +195,9 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
             $keyboard = [
                 [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=org.outline.android.client']],
-                [['text' => '🪟 Windows', 'url' => 'https://getoutline.org/get-started/step-1']],
                 [['text' => '🍎 iOS', 'url' => 'https://apps.apple.com/us/app/outline-app/id1356177741']],
-                [['text' => '🖥️ macOS', 'url' => 'https://getoutline.org/get-started/step-1']],
+                [['text' => '🪟 Windows', 'url' => 'https://outline-vpn.com/download.php?os=c_windows']],
+                [['text' => '🖥️ macOS', 'url' => 'https://outline-vpn.com/download.php?os=c_macos']],
             ];
 
             Telegram::sendMessage([
