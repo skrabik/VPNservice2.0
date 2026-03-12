@@ -1,38 +1,31 @@
-FROM php:8.4.4-fpm
+FROM php:8.3-fpm
 
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libpq-dev \
-    libonig-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libzip-dev \
-    nodejs \
-    npm \
+WORKDIR /var/www/html
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_HOME=/tmp/composer
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+        libicu-dev \
+        libpq-dev \
+        libzip-dev \
+        postgresql-client \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install -j"$(nproc)" \
+        bcmath \
+        intl \
+        opcache \
+        pdo_pgsql \
+        pgsql \
+        zip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-    pdo \
-    pdo_pgsql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip \
-    xml
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY docker/php/entrypoint.sh /usr/local/bin/app-entrypoint
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN chmod +x /usr/local/bin/app-entrypoint
 
-RUN groupadd -g 1000 www \
-    && useradd -u 1000 -ms /bin/bash -g www www
-
-EXPOSE 9000
-
-CMD ["php-fpm"] 
+CMD ["app-entrypoint"]
