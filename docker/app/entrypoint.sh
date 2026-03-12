@@ -10,6 +10,12 @@ echo "Preparing Laravel application..."
 mkdir -p /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views /var/www/bootstrap/cache
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+if [ -n "${PUBLIC_SHARE_PATH:-}" ]; then
+    echo "Syncing public assets to ${PUBLIC_SHARE_PATH}..."
+    mkdir -p "${PUBLIC_SHARE_PATH}"
+    cp -a /var/www/public/. "${PUBLIC_SHARE_PATH}/"
+fi
+
 while [ "$attempt" -le "$max_attempts" ]; do
     echo "Running migrations (attempt $attempt/$max_attempts)..."
 
