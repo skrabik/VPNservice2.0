@@ -7,7 +7,9 @@
 Dockerfile
 docker-compose.yml
 .dockerignore
-docker/
+docker/*
+!docker/app/
+!docker/app/entrypoint.sh
 
 # Node.js
 node_modules/
