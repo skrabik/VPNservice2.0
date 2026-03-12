@@ -100,24 +100,6 @@ php artisan orchid:admin
 npm run build
 ```
 
-## Docker Deploy
-
-Для production используйте схему:
-- `app` - Laravel `php-fpm`
-- `nginx` - внутренний контейнер для статики и `fastcgi`
-- `postgres` - база данных
-- хостовый `nginx` + `certbot` - только TLS и reverse proxy на `127.0.0.1:8080`
-
-Запуск:
-```bash
-docker compose up -d --build
-```
-
-После запуска:
-- контейнер `app` автоматически выполнит `php artisan migrate --force`
-- контейнер `nginx` будет отдавать `public/build` и остальную статику
-- внешний `nginx` можно настроить по примеру `deploy/nginx/accelvpn.online.conf.example`
-
 ## 📁 Структура проекта
 
 ```
