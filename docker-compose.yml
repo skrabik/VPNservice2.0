@@ -29,7 +29,7 @@ services:
       retries: 3
 
   postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: vpnservice_postgres
     restart: unless-stopped
     environment:
