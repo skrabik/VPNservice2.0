@@ -1,3 +1,16 @@
+FROM node:22-bookworm-slim AS frontend
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY resources ./resources
+COPY public ./public
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+
+RUN npm run build
+
 FROM php:8.4.4-fpm
 
 RUN apt-get update && apt-get install -y \
@@ -12,8 +25,6 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libzip-dev \
-    nodejs \
-    npm \
     && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -28,11 +39,26 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     zip \
     xml
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN groupadd -g 1000 www \
-    && useradd -u 1000 -ms /bin/bash -g www www
+WORKDIR /var/www
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-scripts
+
+COPY . .
+COPY --from=frontend /app/public/build ./public/build
+COPY docker/app/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 9000
 
-CMD ["php-fpm"] 
+ENTRYPOINT ["docker-entrypoint.sh"]

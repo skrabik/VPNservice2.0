@@ -6,22 +6,17 @@ services:
     container_name: vpnservice_app
     restart: unless-stopped
     working_dir: /var/www/
+    env_file:
+      - .env
     volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
     ports:
       - "127.0.0.1:9000:9000"
-    environment:
-      DB_CONNECTION: pgsql
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: vpnservice
-      DB_USERNAME: vpnservice_user
-      DB_PASSWORD: vpnservice_password
     networks:
       - vpnservice_network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "php-fpm", "-t" ]
       interval: 30s
@@ -33,14 +28,19 @@ services:
     container_name: vpnservice_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: vpnservice
-      POSTGRES_USER: vpnservice_user
-      POSTGRES_PASSWORD: vpnservice_password
+      POSTGRES_DB: ${DB_DATABASE:-vpnservice}
+      POSTGRES_USER: ${DB_USERNAME:-vpnservice_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vpnservice_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - vpnservice_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-vpnservice_user} -d ${DB_DATABASE:-vpnservice}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:
