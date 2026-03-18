@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Orchid\Filters\Filterable;
 use Orchid\Screen\AsSource;
@@ -12,17 +13,12 @@ class Server extends Model
 {
     use AsSource, Filterable, HasFactory;
 
-    const SERVER_TYPE_OUTLINE_KEY = 'outline';
+    const SERVER_TYPE_3XUI_KEY = '3xui';
 
-    const SERVER_TYPE_OUTLINE_NAME = 'Outline VPN';
-
-    const SERVER_TYPE_OPENVPN_KEY = 'openvpn';
-
-    const SERVER_TYPE_OPENVPN_NAME = 'OpenVPN';
+    const SERVER_TYPE_3XUI_NAME = '3X-UI';
 
     const SERVER_TYPE_OPTIONS = [
-        self::SERVER_TYPE_OUTLINE_KEY => self::SERVER_TYPE_OUTLINE_NAME,
-        self::SERVER_TYPE_OPENVPN_KEY => self::SERVER_TYPE_OPENVPN_NAME,
+        self::SERVER_TYPE_3XUI_KEY => self::SERVER_TYPE_3XUI_NAME,
     ];
 
     protected $fillable = [
@@ -66,5 +62,22 @@ class Server extends Model
     public function parameters(): HasMany
     {
         return $this->hasMany(ServerParameter::class);
+    }
+
+    public function inbounds(): HasMany
+    {
+        return $this->hasMany(ServerInbound::class);
+    }
+
+    public function defaultInbound(): HasOne
+    {
+        return $this->hasOne(ServerInbound::class)->where('is_default', true);
+    }
+
+    public function getParameterValue(string $key): ?string
+    {
+        return $this->parameters
+            ->firstWhere('key', $key)
+            ?->value;
     }
 }

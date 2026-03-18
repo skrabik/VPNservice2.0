@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0c46f5259eaabd97fc75379719b97f6",
+    "content-hash": "eb1bbf61e2e026394be27002d3fefe31",
     "packages": [
         {
             "name": "brick/math",
@@ -1134,52 +1134,6 @@
                 }
             ],
             "time": "2025-02-03T10:55:03+00:00"
-        },
-        {
-            "name": "intensa/outline-api-client",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/intensa/outline-api-client.git",
-                "reference": "0ec6d5117077bde66384dcfb30814b91f388c9c4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/intensa/outline-api-client/zipball/0ec6d5117077bde66384dcfb30814b91f388c9c4",
-                "reference": "0ec6d5117077bde66384dcfb30814b91f388c9c4",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.0",
-                "php": ">=7.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "OutlineApiClient\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ivan Shishkin",
-                    "email": "i.shishkin@intensa.ru"
-                }
-            ],
-            "description": "A simple API client for OutlineVPN written in PHP",
-            "keywords": [
-                "outline php",
-                "outlinevpn"
-            ],
-            "support": {
-                "issues": "https://github.com/intensa/outline-api-client/issues",
-                "source": "https://github.com/intensa/outline-api-client/tree/1.0.2"
-            },
-            "time": "2024-01-08T06:44:27+00:00"
         },
         {
             "name": "irazasyed/telegram-bot-sdk",

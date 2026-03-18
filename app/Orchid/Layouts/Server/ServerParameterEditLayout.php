@@ -4,7 +4,6 @@ namespace App\Orchid\Layouts\Server;
 
 use App\Models\ServerParameter;
 use Orchid\Screen\Field;
-use Orchid\Screen\Fields\Group;
 use Orchid\Screen\Fields\Input;
 use Orchid\Screen\Layouts\Rows;
 
@@ -39,17 +38,23 @@ class ServerParameterEditLayout extends Rows
         foreach ($required_parameters as $parameter_key) {
             if (isset($existing_parameters[$parameter_key])) {
                 $parameter = $existing_parameters[$parameter_key];
-                $parameters_fields[] = Input::make("server_parameters[$parameter->id][value]")
-                    ->type('text')
+                $field = Input::make("server_parameters[$parameter->id][value]")
+                    ->type($parameter_key === ServerParameter::SERVER_PARAMETER_PANEL_PASSWORD_KEY ? 'password' : 'text')
                     ->value($parameter->value)
-                    ->required()
-                    ->title($parameter_key);
+                    ->title(ServerParameter::SERVER_PARAMETER_LABELS[$parameter_key] ?? $parameter_key)
+                    ->help($parameter_key);
             } else {
-                $parameters_fields[] = Input::make("new_server_parameters[$parameter_key]")
-                    ->type('text')
-                    ->required()
-                    ->title($parameter_key);
+                $field = Input::make("new_server_parameters[$parameter_key]")
+                    ->type($parameter_key === ServerParameter::SERVER_PARAMETER_PANEL_PASSWORD_KEY ? 'password' : 'text')
+                    ->title(ServerParameter::SERVER_PARAMETER_LABELS[$parameter_key] ?? $parameter_key)
+                    ->help($parameter_key);
             }
+
+            if (! in_array($parameter_key, ServerParameter::OPTIONAL_SERVER_PARAMETERS, true)) {
+                $field->required();
+            }
+
+            $parameters_fields[] = $field;
         }
 
         return $parameters_fields;

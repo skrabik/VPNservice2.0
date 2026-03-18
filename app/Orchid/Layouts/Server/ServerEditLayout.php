@@ -8,7 +8,6 @@ use App\Models\Server;
 use Orchid\Screen\Field;
 use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Select;
 use Orchid\Screen\Layouts\Rows;
 
 class ServerEditLayout extends Rows
@@ -28,18 +27,16 @@ class ServerEditLayout extends Rows
     public function fields(): array
     {
         return [
+            Input::make('server.type')
+                ->type('hidden')
+                ->value(Server::SERVER_TYPE_3XUI_KEY),
+
             Input::make('server.hostname')
                 ->type('text')
                 ->max(255)
                 ->required()
-                ->title('Name')
+                ->title('Host Name')
                 ->placeholder('Enter server host name'),
-
-            Select::make('server.type')
-                ->options(Server::SERVER_TYPE_OPTIONS)
-                ->required()
-                ->title('Type')
-                ->help('Select server type'),
 
             Input::make('server.ip_address')
                 ->type('text')
@@ -53,6 +50,12 @@ class ServerEditLayout extends Rows
                 ->max(255)
                 ->title('Location')
                 ->placeholder('Enter server location'),
+
+            Input::make('server.max_users')
+                ->type('number')
+                ->min(1)
+                ->title('Max Users')
+                ->placeholder('Optional capacity limit'),
 
             CheckBox::make('server.active')
                 ->sendTrueOrFalse()
