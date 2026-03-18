@@ -3,7 +3,6 @@
 namespace App\Telegram\Services;
 
 use App\Models\Customer;
-use App\Models\PaymentMethod;
 use App\Models\Plan;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
@@ -26,8 +25,6 @@ class SuccessfulPaymentService
 
             $plan = Plan::find((int) $payload['plan_id']);
 
-            $payment_method = PaymentMethod::find((int) $payload['payment_method_id']);
-
             if (! $plan) {
                 Log::error('Plan not found while processing payment', [
                     'plan_id' => $payload['plan_id'] ?? null,
@@ -36,20 +33,6 @@ class SuccessfulPaymentService
                 Telegram::sendMessage([
                     'chat_id' => $customer->telegram_id,
                     'text' => '❌ Ошибка: план не найден. Обратитесь к администратору.',
-                    'parse_mode' => 'HTML',
-                ]);
-
-                return;
-            }
-
-            if (! $payment_method) {
-                Log::error('Payment method not found while processing payment', [
-                    'payment_method_id' => $payload['payment_method_id'] ?? null,
-                ]);
-
-                Telegram::sendMessage([
-                    'chat_id' => $customer->telegram_id,
-                    'text' => '❌ Ошибка: способ оплаты не найден. Обратитесь к администратору.',
                     'parse_mode' => 'HTML',
                 ]);
 
@@ -67,7 +50,6 @@ class SuccessfulPaymentService
                 'amount' => $plan->stars,
                 'currency' => 'XTR',
                 'transaction_id' => $successful_payment->getTelegramPaymentChargeId(),
-                'payment_method_id' => $payment_method->id,
             ]);
 
             $message = "🎉 <b>Подписка успешно активирована!</b>\n\n".

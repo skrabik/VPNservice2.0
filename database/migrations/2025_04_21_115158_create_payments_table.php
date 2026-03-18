@@ -28,11 +28,6 @@ return new class extends Migration
             $table->string('currency', 256)->nullable();
             $table->string('transaction_id', 512)->nullable();
 
-            $table->integer('payment_method_id');
-            $table->foreign('payment_method_id')
-                ->references('id')
-                ->on('payment_methods');
-
             $table->timestamps();
         });
     }

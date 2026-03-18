@@ -62,11 +62,6 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.plans')
                 ->permission('platform.plans'),
 
-            Menu::make(__('Payment Methods'))
-                ->icon('bs.credit-card')
-                ->route('platform.payment_methods')
-                ->permission('platform.payment_methods'),
-
             Menu::make(__('Telegram Logs'))
                 ->icon('bs.chat-dots')
                 ->route('platform.command-logs')
@@ -96,7 +91,6 @@ class PlatformProvider extends OrchidServiceProvider
                 ->addPermission('platform.servers', __('Servers'))
                 ->addPermission('platform.customers', __('Customers'))
                 ->addPermission('platform.plans', __('Plans'))
-                ->addPermission('platform.payment_methods', __('Payment Methods'))
                 ->addPermission('platform.command-logs', __('Telegram Logs'))
                 ->addPermission('platform.support-tickets', __('Support Tickets')),
         ];

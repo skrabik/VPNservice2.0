@@ -13,7 +13,6 @@ class Payment extends Model
         'amount',
         'currency',
         'transaction_id',
-        'payment_method_id',
     ];
 
     public function customer(): BelongsTo
@@ -24,10 +23,5 @@ class Payment extends Model
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
-    }
-
-    public function payment_method(): BelongsTo
-    {
-        return $this->belongsTo(PaymentMethod::class);
     }
 }

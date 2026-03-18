@@ -15,72 +15,18 @@ class InstructionsCommand extends BaseCommand
             'action' => 'Вызвал команду /instructions',
         ]);
 
-        // Проверяем параметры из callback_data
-        if (isset($this->params['instruction_type'])) {
-            $this->sendSpecificInstruction($this->params['instruction_type']);
-
-            return;
-        }
-
-        // Получаем текст сообщения для определения действия
-        $messageText = $this->update->getMessage()->getText();
-
-        // Определяем тип инструкции по тексту кнопки
-        $instructionType = match ($messageText) {
-            '⚡ Xray (V2Ray)' => 'xray',
-            '⬅️ Назад' => null,
-            default => null
-        };
-
-        // Если это кнопка "Назад" или команда /instructions - показываем главное меню
-        if ($instructionType === null) {
-            $this->sendMainInstructions();
-
-            return;
-        }
-
-        // Отправляем конкретную инструкцию
-        $this->sendSpecificInstruction($instructionType);
+        $this->sendInstructions();
     }
 
-    private function sendMainInstructions(): void
+    private function sendInstructions(): void
     {
-        $message = "🔧 <b>Инструкции по подключению к VPN</b>\n\n".
-            'Сейчас поддерживается подключение через Xray / VLESS.';
-
-        $keyboard = [
-            [
-                ['text' => '⚡ Xray / VLESS', 'callback_data' => '/instructions?instruction_type=xray'],
-            ],
-            [
-                ['text' => '⬅️ Назад', 'callback_data' => '/help'],
-            ],
-        ];
-
-        Telegram::sendMessage([
-            'chat_id' => $this->customer->telegram_id,
-            'text' => $message,
-            'parse_mode' => 'HTML',
-            'reply_markup' => json_encode([
-                'inline_keyboard' => $keyboard,
-            ]),
-        ]);
-    }
-
-    private function sendSpecificInstruction(string $type): void
-    {
-        $instruction = match ($type) {
-            'xray' => $this->getXrayInstructions(),
-            default => $this->getMainInstructions()
-        };
-
         $keyboard = [
             ['⬅️ Назад'],
         ];
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
-            'text' => $instruction,
+            'text' => $this->getInstructions(),
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
             'reply_markup' => json_encode([
@@ -91,7 +37,7 @@ class InstructionsCommand extends BaseCommand
         ]);
     }
 
-    private function getXrayInstructions(): string
+    private function getInstructions(): string
     {
         return "⚡ <b>Инструкция по подключению к Xray (V2Ray)</b>\n\n".
             "🔹 <b>Шаг 1: Скачивание приложения</b>\n".
@@ -124,24 +70,5 @@ class InstructionsCommand extends BaseCommand
             "• VLESS быстрее, но менее совместим\n".
             "• Trojan лучше обходит блокировки\n".
             '• Для получения конфигурации используйте /key';
-    }
-
-    private function getMainInstructions(): string
-    {
-        return "🔧 <b>Инструкции по подключению к VPN</b>\n\n".
-            "Сейчас поддерживается только:\n\n".
-            "⚡ <b>Xray / VLESS</b>\n".
-            "• Скачайте V2RayNG (Android) или V2RayX (iOS)\n".
-            "• Добавьте конфигурацию сервера\n".
-            "• Выберите протокол (VMess, VLESS, Trojan)\n".
-            "• Нажмите кнопку подключения\n\n".
-
-            "💡 <b>Полезные советы:</b>\n".
-            "• Убедитесь, что у вас стабильное интернет-соединение\n".
-            "• При проблемах с подключением попробуйте другой сервер\n".
-            "• Для получения ключа используйте команду /key\n".
-            "• Для оплаты используйте команду /pay\n\n".
-
-            '❓ Если у вас возникли вопросы, обратитесь в поддержку.';
     }
 }
