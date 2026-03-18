@@ -15,26 +15,6 @@ class PreCheckoutQueryService
         try {
             $pre_checkout_query = $update->getPreCheckoutQuery();
 
-            Telegram::answerPreCheckoutQuery([
-                'pre_checkout_query_id' => $pre_checkout_query->getId(),
-                'ok' => false,
-                'error_message' => 'Нет возможности оплатить',
-            ]);
-
-            TelegramCommandLog::create([
-                'customer_id' => $customer->id,
-                'command_name' => 'человек оплатил',
-                'action' => 'Пользователь оплатил, но нет возможности оплатить',
-            ]);
-
-            Telegram::sendMessage([
-                'chat_id' => $customer->telegram_id,
-                'text' => 'Извините, сейчас оплата не доступна. Мы сообщим вам, когда всё заработает)',
-                'parse_mode' => 'HTML',
-            ]);
-
-            return;
-
             if ($customer->hasActiveSubscription()) {
                 $subscription = $customer->subscriptions()->latest()->first();
 
@@ -63,6 +43,12 @@ class PreCheckoutQueryService
 
                 return;
             }
+
+            TelegramCommandLog::create([
+                'customer_id' => $customer->id,
+                'command_name' => 'pre_checkout_query',
+                'action' => 'Пользователь начал оплату подписки',
+            ]);
 
             Telegram::answerPreCheckoutQuery([
                 'pre_checkout_query_id' => $pre_checkout_query->getId(),

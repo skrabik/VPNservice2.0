@@ -6,9 +6,12 @@ class CommandFactory
 {
     private static array $command_map = [
         '/start' => StartCommand::class,
+        'start' => StartCommand::class,
         '/key' => KeyCommand::class,
         '🔑 Получить ключ' => KeyCommand::class,
         '/pay' => PayCommand::class,
+        '/buy' => PayCommand::class,
+        '/plan' => PayCommand::class,
         '💳 Оплатить подписку' => PayCommand::class,
         '/status' => StatusCommand::class,
         '📊 Статус подписки' => StatusCommand::class,
@@ -16,6 +19,8 @@ class CommandFactory
         '📱 Инструкции по подключению' => InstructionsCommand::class,
         '/promo' => PromoCommand::class,
         '🎁 Ввести промокод' => PromoCommand::class,
+        '/help' => HelpCommand::class,
+        'help' => HelpCommand::class,
         '/support' => SupportCommand::class,
         '📝 Поддержка' => SupportCommand::class,
     ];

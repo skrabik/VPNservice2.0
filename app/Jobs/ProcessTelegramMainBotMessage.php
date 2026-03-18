@@ -7,13 +7,12 @@ use App\Models\CustomerPendingAction;
 use App\Models\Plan;
 use App\Models\Server;
 use App\Models\Subscription;
-use App\Models\VpnKey;
-use App\Services\OutlineService;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
 use App\Telegram\Services\SuccessfulPaymentService;
 use App\Telegram\Services\SupportTicketService;
 use App\Telegram\TelegramManager;
+use App\Services\VpnProviders\VpnAccessManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -38,10 +37,14 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     {
         try {
             $update = new Update($this->jsonData);
+            $callbackQuery = $update->getCallbackQuery();
+            $preCheckoutQuery = $update->getPreCheckoutQuery();
             $message = $update->getMessage();
 
-            if (! $message) {
-                Log::warning('No message found in update');
+            if (! $message && ! $callbackQuery && ! $preCheckoutQuery) {
+                Log::warning('Unsupported Telegram update received', [
+                    'update_keys' => array_keys($this->jsonData),
+                ]);
 
                 return;
             }
@@ -57,10 +60,18 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
             $customer = Customer::where('telegram_id', $telegram_id)->first();
 
             if (! $customer) {
-                $from = $message->getFrom();
+                $from = $callbackQuery?->getFrom() ?? $preCheckoutQuery?->getFrom() ?? $message?->getFrom();
+                if (! $from) {
+                    Log::warning('No from payload found in update', [
+                        'telegram_id' => $telegram_id,
+                    ]);
+
+                    return;
+                }
+
                 $customer = Customer::create([
                     'telegram_id' => $telegram_id,
-                    'username' => $from->getUsername(),
+                    'telegram_username' => $from->getUsername(),
                     'first_name' => $from->getFirstName(),
                     'last_name' => $from->getLastName(),
                 ]);
@@ -73,19 +84,19 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 return;
             }
 
-            if ($update->getPreCheckoutQuery()) {
+            if ($preCheckoutQuery) {
                 PreCheckoutQueryService::process($update, $customer);
 
                 return;
             }
 
-            if ($update->getMessage()->getSuccessfulPayment()) {
+            if ($message?->getSuccessfulPayment()) {
                 SuccessfulPaymentService::process($update, $customer);
 
                 return;
             }
 
-            if ($customer->pending_actions()->exists()) {
+            if ($message && $customer->pending_actions()->exists()) {
                 $pendingAction = $customer->pending_actions()->first();
 
                 if ($pendingAction->action_id === CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE &&
@@ -98,6 +109,10 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 }
 
                 $customer->pending_actions()->delete();
+            }
+
+            if ($callbackQuery) {
+                $this->answerCallbackQuery($callbackQuery->getId());
             }
 
             CommandService::process($update, $customer);
@@ -116,12 +131,12 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
             if (! $promo_plan) {
                 $promo_plan = Plan::create([
-                    'name' => 'Промо план',
+                    'title' => 'Промо план',
                     'slug' => 'promo',
                     'description' => 'Бесплатный план на 7 дней для новых пользователей',
                     'price' => 0,
                     'period' => 7,
-                    'is_active' => true,
+                    'active' => true,
                 ]);
 
                 Log::info('Created promo plan', ['plan_id' => $promo_plan->id]);
@@ -146,38 +161,50 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     private function createWelcomeVpnKey(Customer $customer): void
     {
         try {
-            $server = Server::first();
+            $server = Server::query()
+                ->where('active', true)
+                ->orderByDesc('id')
+                ->first();
 
             if ($server) {
-                $outline_service = new OutlineService($server);
-                $password = $customer->telegram_id.'_'.time();
-                $user = $outline_service->createUser($password);
+                $activeSubscription = $customer->subscriptions()
+                    ->where('date_end', '>', now())
+                    ->latest('date_end')
+                    ->first();
 
-                if ($user) {
-                    VpnKey::create([
-                        'customer_id' => $customer->id,
-                        'server_id' => $server->id,
-                        'server_user_id' => $user['id'],
-                        'access_key' => $user['accessUrl'],
-                        'server_type' => $server->type,
-                        'is_active' => true,
-                    ]);
+                $vpnKey = (new VpnAccessManager)->createForCustomer($server, $customer, [
+                    'expires_at' => $activeSubscription?->date_end,
+                ]);
 
-                    Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
+                Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
 
-                    $this->sendWelcomeMessage($customer, $user['accessUrl'], $server->hostname);
-                }
+                $this->sendWelcomeMessage($customer, $vpnKey->access_key, $server->hostname);
             } else {
                 Log::error('No server found');
 
-                Telegram::sendMessage([
-                    'chat_id' => $customer->telegram_id,
-                    'text' => 'Сервер не найден',
-                ]);
+                $this->sendWelcomeVpnUnavailableMessage($customer);
             }
 
         } catch (\Exception $e) {
             Log::error('Error creating welcome VPN key', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->sendWelcomeVpnUnavailableMessage($customer);
+        }
+    }
+
+    private function sendWelcomeVpnUnavailableMessage(Customer $customer): void
+    {
+        try {
+            Telegram::sendMessage([
+                'chat_id' => $customer->telegram_id,
+                'text' => "⚠️ Ваша бесплатная подписка уже активирована, но сейчас сервер временно недоступен.\n\nПопробуйте получить VPN-ключ чуть позже командой /key.\n\nЕсли проблема не исчезнет, обратитесь к администратору.",
+                'parse_mode' => 'HTML',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error sending welcome VPN unavailable message', [
                 'customer_id' => $customer->id,
                 'error' => $e->getMessage(),
             ]);
@@ -193,12 +220,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 "<code>{$access_url}</code>\n\n".
                 'Качайте приложение для подключения к VPN:';
 
-            $keyboard = [
-                [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=org.outline.android.client']],
-                [['text' => '🍎 iOS', 'url' => 'https://apps.apple.com/us/app/outline-app/id1356177741']],
-                [['text' => '🪟 Windows', 'url' => 'https://outline-vpn.com/download.php?os=c_windows']],
-                [['text' => '🖥️ macOS', 'url' => 'https://outline-vpn.com/download.php?os=c_macos']],
-            ];
+            $keyboard = $this->buildAppsKeyboard();
 
             Telegram::sendMessage([
                 'chat_id' => $customer->telegram_id,
@@ -216,5 +238,29 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function answerCallbackQuery(string $callbackQueryId): void
+    {
+        try {
+            Telegram::answerCallbackQuery([
+                'callback_query_id' => $callbackQueryId,
+            ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to answer Telegram callback query', [
+                'callback_query_id' => $callbackQueryId,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function buildAppsKeyboard(): array
+    {
+        return [
+            [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=com.v2ray.ang']],
+            [['text' => '🍎 iOS', 'url' => 'https://apps.apple.com/us/app/streisand/id6450534064']],
+            [['text' => '🪟 Windows', 'url' => 'https://github.com/2dust/v2rayN/releases']],
+            [['text' => '🖥️ macOS', 'url' => 'https://github.com/yichengchen/clashX/releases']],
+        ];
     }
 }

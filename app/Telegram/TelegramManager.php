@@ -10,6 +10,8 @@ class TelegramManager
     {
         if ($callback = $update->getCallbackQuery()) {
             return $callback->getFrom()->getId();
+        } elseif ($preCheckout = $update->getPreCheckoutQuery()) {
+            return $preCheckout->getFrom()->getId();
         } elseif ($message = $update->getMessage()) {
             try {
                 return $message->getFrom()->getId();
@@ -39,6 +41,13 @@ class TelegramManager
     public static function parseMessageData(Update $update): array
     {
         $message_data = self::getMessageData($update);
+        if (! is_string($message_data) || $message_data === '') {
+            return [
+                'command_name' => '',
+                'params' => [],
+            ];
+        }
+
         $parts = explode('?', $message_data, 2);
         if (count($parts) < 2) {
             return [

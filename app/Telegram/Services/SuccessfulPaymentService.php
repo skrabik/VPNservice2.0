@@ -29,11 +29,27 @@ class SuccessfulPaymentService
             $payment_method = PaymentMethod::find((int) $payload['payment_method_id']);
 
             if (! $plan) {
-                Log::error("Plan not found with ID: {$plan->id}");
+                Log::error('Plan not found while processing payment', [
+                    'plan_id' => $payload['plan_id'] ?? null,
+                ]);
 
                 Telegram::sendMessage([
                     'chat_id' => $customer->telegram_id,
                     'text' => '❌ Ошибка: план не найден. Обратитесь к администратору.',
+                    'parse_mode' => 'HTML',
+                ]);
+
+                return;
+            }
+
+            if (! $payment_method) {
+                Log::error('Payment method not found while processing payment', [
+                    'payment_method_id' => $payload['payment_method_id'] ?? null,
+                ]);
+
+                Telegram::sendMessage([
+                    'chat_id' => $customer->telegram_id,
+                    'text' => '❌ Ошибка: способ оплаты не найден. Обратитесь к администратору.',
                     'parse_mode' => 'HTML',
                 ]);
 
@@ -47,7 +63,7 @@ class SuccessfulPaymentService
             ]);
 
             $customer->payments()->create([
-                'subscription_id' => $customer->subscriptions()->latest()->first()->id,
+                'subscription_id' => $new_subscription->id,
                 'amount' => $plan->stars,
                 'currency' => 'XTR',
                 'transaction_id' => $successful_payment->getTelegramPaymentChargeId(),
@@ -55,7 +71,7 @@ class SuccessfulPaymentService
             ]);
 
             $message = "🎉 <b>Подписка успешно активирована!</b>\n\n".
-                "✅ Ваша подписка на план <b>{$plan->name}</b> активна до {$new_subscription->date_end}\n\n".
+                "✅ Ваша подписка на план <b>{$plan->title}</b> активна до {$new_subscription->date_end}\n\n".
                 "🔑 Теперь вы можете получить ключ VPN, используя команду:\n".
                 "/key\n\n".
                 'После получения ключа следуйте инструкциям по подключению к VPN серверу.';
