@@ -163,6 +163,8 @@ class KeyCommand extends BaseCommand
 
         $server->loadMissing(['defaultInbound', 'inbounds']);
 
+        $activeSubscription = null;
+
         try {
             $accessManager = new VpnAccessManager;
             $accessManager->deleteCustomerKeys($this->customer);

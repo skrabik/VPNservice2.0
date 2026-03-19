@@ -129,7 +129,6 @@ class ThreeXuiService
             'sid' => $this->pickRealityShortId($realitySettings['shortIds'] ?? []),
             'spx' => $this->server->getParameterValue(ServerParameter::SERVER_PARAMETER_DEFAULT_REALITY_SPIDER_X_KEY)
                 ?: ($realityInnerSettings['spiderX'] ?? null),
-            'pqv' => $realityInnerSettings['mldsa65Verify'] ?? null,
         ], static fn ($value) => $value !== null && $value !== '');
 
         return sprintf(
