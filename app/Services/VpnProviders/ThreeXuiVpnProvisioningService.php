@@ -28,7 +28,7 @@ class ThreeXuiVpnProvisioningService implements VpnProvisioningServiceInterface
         $clientPayload = $service->makeClientPayload([
             'email' => strtolower('tg'.$customer->id.'_'.substr(md5((string) microtime(true)), 0, 8)),
             'flow' => $server->getParameterValue(ServerParameter::SERVER_PARAMETER_DEFAULT_CLIENT_FLOW_KEY) ?? '',
-            'limitIp' => 2,
+            'limitIp' => 1,
             'expiryTime' => $expiryTime,
             'totalGB' => $trafficLimitBytes,
             'tgId' => $customer->telegram_id ?? '',
