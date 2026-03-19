@@ -105,10 +105,15 @@ class ThreeXuiService
 
     public function buildVlessUri(ServerInbound $inbound, array $client): string
     {
-        $serverHost = $this->server->hostname ?: $this->server->ip_address;
+        $serverHost = $this->resolveServerHost();
+        $clientId = $client['uuid'] ?? $client['id'] ?? null;
         $streamSettings = $inbound->decodeStreamSettings();
         $realitySettings = $streamSettings['realitySettings'] ?? [];
         $realityInnerSettings = $realitySettings['settings'] ?? [];
+
+        if (! is_string($clientId) || trim($clientId) === '') {
+            throw new RuntimeException('3X-UI client UUID is missing for VLESS URI generation.');
+        }
 
         $query = array_filter([
             'type' => $streamSettings['network'] ?? 'tcp',
@@ -124,11 +129,12 @@ class ThreeXuiService
             'sid' => $this->pickRealityShortId($realitySettings['shortIds'] ?? []),
             'spx' => $this->server->getParameterValue(ServerParameter::SERVER_PARAMETER_DEFAULT_REALITY_SPIDER_X_KEY)
                 ?: ($realityInnerSettings['spiderX'] ?? null),
+            'pqv' => $realityInnerSettings['mldsa65Verify'] ?? null,
         ], static fn ($value) => $value !== null && $value !== '');
 
         return sprintf(
             'vless://%s@%s:%s?%s#%s',
-            $client['id'],
+            $clientId,
             $serverHost,
             $inbound->port,
             http_build_query($query),
@@ -280,5 +286,20 @@ class ThreeXuiService
         }
 
         return null;
+    }
+
+    private function resolveServerHost(): string
+    {
+        $ipAddress = trim((string) $this->server->ip_address);
+        if ($ipAddress !== '') {
+            return $ipAddress;
+        }
+
+        $hostname = trim((string) $this->server->hostname);
+        if ($hostname !== '') {
+            return $hostname;
+        }
+
+        throw new RuntimeException('3X-UI server host is not configured.');
     }
 }
