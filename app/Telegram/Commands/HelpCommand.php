@@ -30,13 +30,21 @@ class HelpCommand extends BaseCommand
                   "💳 /buy - Купить подписку\n".
                   "🎁 /promo - Ввести промокод\n".
                   "📝 /support - Создать тикет в поддержку\n".
-                  'Если у вас возникли вопросы, используйте команду /support.';
+                  'Нажмите на нужную команду ниже.';
 
         $keyboard = [
-            ['🔑 Получить ключ', '📱 Инструкции по подключению'],
-            ['💳 Оплатить подписку', '📊 Статус подписки'],
-            ['🎁 Ввести промокод', '📝 Поддержка'],
-            ['❓ Помощь'],
+            [
+                ['text' => '🔑 /key', 'callback_data' => '/key'],
+                ['text' => '📱 /instructions', 'callback_data' => '/instructions'],
+            ],
+            [
+                ['text' => '📊 /status', 'callback_data' => '/status'],
+                ['text' => '💳 /buy', 'callback_data' => '/buy'],
+            ],
+            [
+                ['text' => '🎁 /promo', 'callback_data' => '/promo'],
+                ['text' => '📝 /support', 'callback_data' => '/support'],
+            ],
         ];
 
         Telegram::sendMessage([
@@ -44,9 +52,7 @@ class HelpCommand extends BaseCommand
             'text' => $message,
             'parse_mode' => 'HTML',
             'reply_markup' => json_encode([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
+                'inline_keyboard' => $keyboard,
             ]),
         ]);
     }
