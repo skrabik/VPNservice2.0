@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class VpnKey extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'customer_id',
         'server_id',
@@ -28,6 +31,7 @@ class VpnKey extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'created_at' => 'datetime',
+        'deleted_at' => 'datetime',
         'expires_at' => 'datetime',
         'traffic_limit_bytes' => 'integer',
         'traffic_used_bytes' => 'integer',

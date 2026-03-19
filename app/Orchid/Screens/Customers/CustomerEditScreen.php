@@ -6,6 +6,7 @@ namespace App\Orchid\Screens\Customers;
 
 use App\Models\Customer;
 use App\Orchid\Layouts\Customer\CustomerEditLayout;
+use App\Orchid\Layouts\Customer\CustomerVpnKeysLayout;
 use App\Orchid\Layouts\Customer\CustomerSubscriptionsLayout;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
@@ -32,6 +33,9 @@ class CustomerEditScreen extends Screen
         return [
             'customer' => $customer,
             'subscriptions' => $customer->exists ? $customer->subscriptions()->with('plan')->get() : collect(),
+            'vpnKeys' => $customer->exists
+                ? $customer->vpnKeys()->withTrashed()->with(['server', 'inbound'])->orderByDesc('id')->get()
+                : collect(),
         ];
     }
 
@@ -97,6 +101,10 @@ class CustomerEditScreen extends Screen
             Layout::block(CustomerSubscriptionsLayout::class)
                 ->title(__('Subscriptions'))
                 ->description(__('List of customer subscriptions.'))
+                ->canSee($this->customer->exists),
+            Layout::block(CustomerVpnKeysLayout::class)
+                ->title(__('VPN Keys'))
+                ->description(__('List of customer VPN keys, including soft-deleted ones.'))
                 ->canSee($this->customer->exists),
         ];
     }
