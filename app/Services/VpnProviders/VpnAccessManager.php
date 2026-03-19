@@ -16,6 +16,7 @@ class VpnAccessManager
     {
         $provider = $this->providerFactory->forServer($server);
         $attributes = $provider->createAccess($server, $customer, $context);
+        $attributes['server_id'] = $server->id;
 
         return $customer->vpnKeys()->create($attributes);
     }

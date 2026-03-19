@@ -118,6 +118,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
             CommandService::process($update, $customer);
         } catch (\Exception $e) {
             Log::error('Error processing message', [
+                'update_id' => $this->jsonData['update_id'] ?? null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
