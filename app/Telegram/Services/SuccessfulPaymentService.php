@@ -28,7 +28,7 @@ class SuccessfulPaymentService
                 ? Plan::find($planId)
                 : null;
 
-            $plan ??= self::resolveDefaultMonthlyPlan();
+            $plan ??= Plan::resolveOrCreateDefaultMonthlyPlan();
 
             if (! $plan) {
                 Log::error('Plan not found while processing payment', [
@@ -79,12 +79,4 @@ class SuccessfulPaymentService
         }
     }
 
-    private static function resolveDefaultMonthlyPlan(): ?Plan
-    {
-        return Plan::query()
-            ->where('active', true)
-            ->where('period', 30)
-            ->orderBy('id')
-            ->first();
-    }
 }

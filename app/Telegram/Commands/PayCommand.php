@@ -45,44 +45,11 @@ class PayCommand extends BaseCommand
             'action' => 'process_payment',
         ]);
 
-        $plan = $this->resolveDefaultMonthlyPlan();
-
-        if (! $plan) {
-            Telegram::sendMessage([
-                'chat_id' => $this->customer->telegram_id,
-                'text' => '❌ Ошибка: месячный тариф не найден.',
-                'parse_mode' => 'HTML',
-            ]);
-
-            return;
-        }
-
-        $this->processPayment($plan->id);
+        $this->processPayment(Plan::resolveOrCreateDefaultMonthlyPlan());
     }
 
-    private function resolveDefaultMonthlyPlan(): ?Plan
+    private function processPayment(Plan $plan): void
     {
-        return Plan::query()
-            ->where('active', true)
-            ->where('period', 30)
-            ->orderBy('id')
-            ->first();
-    }
-
-    private function processPayment(int $plan_id): void
-    {
-        $plan = Plan::find($plan_id);
-
-        if (! $plan) {
-            Telegram::sendMessage([
-                'chat_id' => $this->customer->telegram_id,
-                'text' => '❌ Ошибка: тариф не найден.',
-                'parse_mode' => 'HTML',
-            ]);
-
-            return;
-        }
-
         if ($this->update->getCallbackQuery()) {
             $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
             Telegram::deleteMessage([

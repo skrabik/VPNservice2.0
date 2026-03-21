@@ -25,6 +25,36 @@ class Plan extends Model
         'active' => 'boolean',
     ];
 
+    public static function resolveOrCreateDefaultMonthlyPlan(): self
+    {
+        $plan = self::query()
+            ->where('active', true)
+            ->where('period', 30)
+            ->orderBy('id')
+            ->first();
+
+        if ($plan) {
+            return $plan;
+        }
+
+        $templatePlan = self::query()
+            ->where('active', true)
+            ->orderBy('id')
+            ->first();
+
+        $plan = new self;
+        $plan->title = 'Подписка на 30 дней';
+        $plan->slug = 'monthly-30-days';
+        $plan->description = 'Автоматически созданный план подписки на 30 дней';
+        $plan->price = (float) ($templatePlan?->price ?? 299);
+        $plan->stars = (int) ($templatePlan?->stars ?? max(1, (int) round((float) ($templatePlan?->price ?? 299))));
+        $plan->period = 30;
+        $plan->active = true;
+        $plan->save();
+
+        return $plan;
+    }
+
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
