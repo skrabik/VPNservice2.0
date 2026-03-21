@@ -39,60 +39,34 @@ class PayCommand extends BaseCommand
             return;
         }
 
-        if (isset($this->params['plan_id'])) {
-            TelegramCommandLog::create([
-                'customer_id' => $this->customer->id,
-                'command_name' => 'процессим платеж',
-                'action' => 'process_payment',
-            ]);
+        TelegramCommandLog::create([
+            'customer_id' => $this->customer->id,
+            'command_name' => 'процессим платеж',
+            'action' => 'process_payment',
+        ]);
 
-            $this->processPayment($this->params['plan_id']);
+        $plan = $this->resolveDefaultMonthlyPlan();
 
-            return;
-        }
-
-        $this->showPlans();
-    }
-
-    private function showPlans(): void
-    {
-        $plans = Plan::where('active', true)->get();
-
-        if ($plans->isEmpty()) {
-            $message = "❌ Нет доступных тарифов.\n\n".
-                'Пожалуйста, попробуйте позже или обратитесь к администратору.';
-
+        if (! $plan) {
             Telegram::sendMessage([
                 'chat_id' => $this->customer->telegram_id,
-                'text' => $message,
+                'text' => '❌ Ошибка: месячный тариф не найден.',
                 'parse_mode' => 'HTML',
             ]);
 
             return;
         }
 
-        $message = "💳 Выберите тарифный план:\n\n";
+        $this->processPayment($plan->id);
+    }
 
-        $keyboard = [];
-        foreach ($plans as $plan) {
-            $keyboard[] = [
-                [
-                    'text' => "{$plan->title} {$plan->stars}🌟",
-                    'callback_data' => "/pay?plan_id={$plan->id}",
-                ],
-            ];
-        }
-
-        $keyboard[] = [['text' => '⬅️ Назад', 'callback_data' => 'start']];
-
-        Telegram::sendMessage([
-            'chat_id' => $this->customer->telegram_id,
-            'text' => $message,
-            'parse_mode' => 'HTML',
-            'reply_markup' => json_encode([
-                'inline_keyboard' => $keyboard,
-            ]),
-        ]);
+    private function resolveDefaultMonthlyPlan(): ?Plan
+    {
+        return Plan::query()
+            ->where('active', true)
+            ->where('period', 30)
+            ->orderBy('id')
+            ->first();
     }
 
     private function processPayment(int $plan_id): void

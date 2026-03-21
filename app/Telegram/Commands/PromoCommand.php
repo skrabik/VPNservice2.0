@@ -11,6 +11,8 @@ use Telegram\Bot\Objects\Update;
 
 class PromoCommand extends BaseCommand
 {
+    private const PROMO_PERIOD_DAYS = 15;
+
     public function __construct(Update $update, Customer $customer, array $params)
     {
         parent::__construct($update, $customer, $params);
@@ -29,7 +31,7 @@ class PromoCommand extends BaseCommand
         if ($message === '/promo' || $message === '🎁 Ввести промокод') {
 
             $text = "🎁 <b>Введите промокод</b>\n\n".
-                "Если у вас есть промокод, введите его ниже для получения бесплатного VPN на неделю.\n\n".
+                "Если у вас есть промокод, введите его ниже для получения бесплатного VPN на 15 дней.\n\n".
                 '💡 Промокоды можно использовать многократно.';
 
             $keyboard = [
@@ -78,13 +80,16 @@ class PromoCommand extends BaseCommand
 
     private function createPromoSubscription(): void
     {
-        $promo_plan = Plan::where('slug', 'promo')->first();
-
-        if (! $promo_plan) {
-            $this->sendError("❌ План для промокода не найден.\n\nПожалуйста, обратитесь к администратору.");
-
-            return;
-        }
+        $promo_plan = Plan::updateOrCreate(
+            ['slug' => 'promo'],
+            [
+                'title' => 'Промо план',
+                'description' => 'Бесплатный план на 15 дней для новых пользователей',
+                'price' => 0,
+                'period' => self::PROMO_PERIOD_DAYS,
+                'active' => true,
+            ]
+        );
 
         $subscription = Subscription::create([
             'customer_id' => $this->customer->id,
@@ -94,7 +99,7 @@ class PromoCommand extends BaseCommand
         ]);
 
         $message = "🎉 <b>Промокод активирован!</b>\n\n".
-            "✅ Вам предоставлен бесплатный VPN на <b>7 дней</b>\n".
+            "✅ Вам предоставлен бесплатный VPN на <b>{$promo_plan->period} дней</b>\n".
             "📅 Дата окончания: <b>{$subscription->date_end->format('d.m.Y H:i')}</b>\n\n".
             "🔑 Теперь вы можете получить ключ VPN, используя команду:\n".
             "/key\n\n".

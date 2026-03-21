@@ -23,7 +23,12 @@ class SuccessfulPaymentService
 
             $payload = json_decode($successful_payment->getInvoicePayload(), true);
 
-            $plan = Plan::find((int) $payload['plan_id']);
+            $planId = (int) ($payload['plan_id'] ?? 0);
+            $plan = $planId > 0
+                ? Plan::find($planId)
+                : null;
+
+            $plan ??= self::resolveDefaultMonthlyPlan();
 
             if (! $plan) {
                 Log::error('Plan not found while processing payment', [
@@ -72,5 +77,14 @@ class SuccessfulPaymentService
                 'parse_mode' => 'HTML',
             ]);
         }
+    }
+
+    private static function resolveDefaultMonthlyPlan(): ?Plan
+    {
+        return Plan::query()
+            ->where('active', true)
+            ->where('period', 30)
+            ->orderBy('id')
+            ->first();
     }
 }

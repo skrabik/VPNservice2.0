@@ -26,6 +26,8 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private const PROMO_PERIOD_DAYS = 15;
+
     protected array $jsonData;
 
     public function __construct(array $json)
@@ -128,26 +130,27 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     private function createWelcomeSubscription(Customer $customer): void
     {
         try {
-            $promo_plan = Plan::where('slug', 'promo')->first();
-
-            if (! $promo_plan) {
-                $promo_plan = Plan::create([
+            $promo_plan = Plan::updateOrCreate(
+                ['slug' => 'promo'],
+                [
                     'title' => 'Промо план',
-                    'slug' => 'promo',
-                    'description' => 'Бесплатный план на 7 дней для новых пользователей',
+                    'description' => 'Бесплатный план на 15 дней для новых пользователей',
                     'price' => 0,
-                    'period' => 7,
+                    'period' => self::PROMO_PERIOD_DAYS,
                     'active' => true,
-                ]);
+                ]
+            );
 
-                Log::info('Created promo plan', ['plan_id' => $promo_plan->id]);
-            }
+            Log::info('Promo plan ensured for welcome subscription', [
+                'plan_id' => $promo_plan->id,
+                'period' => $promo_plan->period,
+            ]);
 
             Subscription::create([
                 'customer_id' => $customer->id,
                 'plan_id' => $promo_plan->id,
                 'date_start' => now(),
-                'date_end' => now()->addDays(7),
+                'date_end' => now()->addDays(self::PROMO_PERIOD_DAYS),
             ]);
 
             Log::info('Created welcome subscription for new customer', ['customer_id' => $customer->id]);
@@ -216,7 +219,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     {
         try {
             $message = "🎉 <b>Добро пожаловать!</b>\n\n".
-                "✅ Вам автоматически предоставлен бесплатный VPN на <b>7 дней</b>\n".
+                "✅ Вам автоматически предоставлен бесплатный VPN на <b>15 дней</b>\n".
                 "🔑 Ваш ключ VPN для сервера {$server_name}:\n\n".
                 "<code>{$access_url}</code>\n\n".
                 'Качайте приложение для подключения к VPN:';
