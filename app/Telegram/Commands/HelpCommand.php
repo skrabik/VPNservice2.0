@@ -23,27 +23,27 @@ class HelpCommand extends BaseCommand
         ]);
 
         $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
-                  "Доступные команды:\n\n".
-                  "🔑 /key - Получить ключ VPN\n".
-                  "📱 /instructions - Инструкции по подключению к VPN\n".
-                  "📊 /status - Проверить статус подписки\n".
-                  "💳 /buy - Купить подписку\n".
-                  "🎁 /promo - Ввести промокод\n".
-                  "📝 /support - Создать тикет в поддержку\n".
-                  'Нажмите на нужную команду ниже.';
+                  "Доступные разделы:\n\n".
+                  "🔑 Получить ключ VPN\n".
+                  "📱 Инструкции по подключению к VPN\n".
+                  "📊 Статус подписки\n".
+                  "💳 Купить подписку\n".
+                  "🎁 Ввести промокод\n".
+                  "📝 Поддержка\n".
+                  'Нажмите на нужную кнопку ниже.';
 
         $keyboard = [
             [
-                ['text' => '🔑 /key', 'callback_data' => '/key'],
-                ['text' => '📱 /instructions', 'callback_data' => '/instructions'],
+                ['text' => '🔑 Получить ключ', 'callback_data' => '/key'],
+                ['text' => '📱 Инструкции', 'callback_data' => '/instructions'],
             ],
             [
-                ['text' => '📊 /status', 'callback_data' => '/status'],
-                ['text' => '💳 /buy', 'callback_data' => '/buy'],
+                ['text' => '📊 Статус', 'callback_data' => '/status'],
+                ['text' => '💳 Купить подписку', 'callback_data' => '/buy'],
             ],
             [
-                ['text' => '🎁 /promo', 'callback_data' => '/promo'],
-                ['text' => '📝 /support', 'callback_data' => '/support'],
+                ['text' => '🎁 Промокод', 'callback_data' => '/promo'],
+                ['text' => '📝 Поддержка', 'callback_data' => '/support'],
             ],
         ];
 
