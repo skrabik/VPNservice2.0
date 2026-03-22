@@ -56,6 +56,12 @@ class KeyCommand extends BaseCommand
             return;
         }
 
+        if (($this->params['mode'] ?? null) === 'view_current') {
+            $this->showCurrentKey();
+
+            return;
+        }
+
         if (isset($this->params['server_id'])) {
             $this->createKeyForServer($this->params['server_id']);
 
@@ -125,6 +131,95 @@ class KeyCommand extends BaseCommand
         ];
 
         $this->sendTelegramMessage($payload, 'key.show_servers_list');
+    }
+
+    private function showCurrentKey(): void
+    {
+        $vpnKey = $this->customer->activeVpnKeys()
+            ->with('server')
+            ->latest('id')
+            ->first();
+
+        if (! $vpnKey) {
+            $message = "❌ У вас пока нет активного ключа VPN.\n\n".
+                'Нажмите кнопку ниже, чтобы создать новый ключ.';
+
+            $keyboard = [
+                [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']],
+                [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+            ];
+
+            if ($this->update->getCallbackQuery()) {
+                $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+
+                $payload = [
+                    'chat_id' => $this->customer->telegram_id,
+                    'message_id' => $message_id,
+                    'text' => $message,
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => json_encode([
+                        'inline_keyboard' => $keyboard,
+                    ]),
+                ];
+
+                $this->editTelegramMessageText($payload, 'key.show_current_key_missing');
+
+                return;
+            }
+
+            $payload = [
+                'chat_id' => $this->customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => $keyboard,
+                ]),
+            ];
+
+            $this->sendTelegramMessage($payload, 'key.show_current_key_missing');
+
+            return;
+        }
+
+        $serverName = $vpnKey->server?->hostname ?? 'неизвестного сервера';
+        $message = "🔐 Ваш текущий ключ VPN для сервера {$serverName}:\n\n".
+            "<code>{$vpnKey->access_key}</code>\n\n".
+            'Если подключение перестало работать, вы можете выпустить новый ключ.';
+
+        $keyboard = [
+            [['text' => '🔑 Получить новый ключ VPN', 'callback_data' => '/key']],
+            [['text' => '📱 Инструкции по подключению', 'callback_data' => '/instructions']],
+            [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+        ];
+
+        if ($this->update->getCallbackQuery()) {
+            $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+
+            $payload = [
+                'chat_id' => $this->customer->telegram_id,
+                'message_id' => $message_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => $keyboard,
+                ]),
+            ];
+
+            $this->editTelegramMessageText($payload, 'key.show_current_key');
+
+            return;
+        }
+
+        $payload = [
+            'chat_id' => $this->customer->telegram_id,
+            'text' => $message,
+            'parse_mode' => 'HTML',
+            'reply_markup' => json_encode([
+                'inline_keyboard' => $keyboard,
+            ]),
+        ];
+
+        $this->sendTelegramMessage($payload, 'key.show_current_key');
     }
 
     private function createKeyForServer(int $server_id): void

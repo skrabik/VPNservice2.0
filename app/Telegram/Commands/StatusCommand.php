@@ -71,6 +71,10 @@ class StatusCommand extends BaseCommand
 
         $keyboard = [];
 
+        if ($days_left > 0 && $active_keys > 0) {
+            $keyboard[] = [['text' => '🔐 Мой ключ VPN', 'callback_data' => '/key?mode=view_current']];
+        }
+
         if ($days_left > 0) {
             $keyboard[] = [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']];
         }
