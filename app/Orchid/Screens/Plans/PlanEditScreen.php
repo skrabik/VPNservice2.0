@@ -73,7 +73,17 @@ class PlanEditScreen extends Screen
 
     public function save(Plan $plan, Request $request)
     {
-        $plan->fill($request->get('plan'))->save();
+        $validated = $request->validate([
+            'plan.title' => ['required', 'string', 'max:256'],
+            'plan.slug' => ['required', 'string', 'max:256'],
+            'plan.description' => ['nullable', 'string', 'max:1024'],
+            'plan.stars' => ['required', 'integer', 'min:1'],
+            'plan.price' => ['required', 'numeric', 'min:0'],
+            'plan.period' => ['required', 'integer', 'min:1'],
+            'plan.active' => ['nullable', 'boolean'],
+        ]);
+
+        $plan->fill($validated['plan'])->save();
         Toast::info('Plan was saved.');
 
         return redirect()->route('platform.plans');

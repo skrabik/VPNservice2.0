@@ -25,6 +25,11 @@ class Plan extends Model
         'active' => 'boolean',
     ];
 
+    public function setStarsAttribute($value): void
+    {
+        $this->attributes['stars'] = max(1, (int) $value);
+    }
+
     public static function resolveOrCreateDefaultMonthlyPlan(): self
     {
         $plan = self::query()

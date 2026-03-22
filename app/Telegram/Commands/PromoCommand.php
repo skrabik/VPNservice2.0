@@ -86,6 +86,7 @@ class PromoCommand extends BaseCommand
                 'title' => 'Промо план',
                 'description' => 'Бесплатный план на 15 дней для новых пользователей',
                 'price' => 0,
+                'stars' => 1,
                 'period' => self::PROMO_PERIOD_DAYS,
                 'active' => true,
             ]

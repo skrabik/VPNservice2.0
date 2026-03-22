@@ -38,9 +38,11 @@ class PlanEditLayout extends Rows
                 ->placeholder('Enter description'),
 
             Input::make('plan.stars')
-                ->type('inteteger')
-                ->reuquired()
-                ->title('Stars'),
+                ->type('number')
+                ->min(1)
+                ->required()
+                ->title('Stars')
+                ->placeholder('Enter stars amount'),
 
             Input::make('plan.price')
                 ->type('number')
