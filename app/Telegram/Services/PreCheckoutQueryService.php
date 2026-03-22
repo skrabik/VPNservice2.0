@@ -23,7 +23,11 @@ class PreCheckoutQueryService
                     'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
 
                 $keyboard = [
-                    [['text' => '❓ Помощь', 'callback_data' => 'help']],
+                    ['🔑 Получить ключ', '📱 Инструкции по подключению'],
+                    ['💳 Оплатить подписку', '📊 Статус подписки'],
+                    // ['🎁 Ввести промокод', '📝 Поддержка'],
+                    // ['❓ Помощь'],
+                    ['📝 Поддержка', '❓ Помощь'],
                 ];
 
                 Telegram::sendMessage([
@@ -31,7 +35,9 @@ class PreCheckoutQueryService
                     'text' => $message,
                     'parse_mode' => 'HTML',
                     'reply_markup' => json_encode([
-                        'inline_keyboard' => $keyboard,
+                        'keyboard' => $keyboard,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => false,
                     ]),
                 ]);
 
