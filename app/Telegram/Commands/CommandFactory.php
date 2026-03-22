@@ -17,8 +17,8 @@ class CommandFactory
         '📊 Статус подписки' => StatusCommand::class,
         '/instructions' => InstructionsCommand::class,
         '📱 Инструкции по подключению' => InstructionsCommand::class,
-        '/promo' => PromoCommand::class,
-        '🎁 Ввести промокод' => PromoCommand::class,
+        // '/promo' => PromoCommand::class,
+        // '🎁 Ввести промокод' => PromoCommand::class,
         '/help' => HelpCommand::class,
         'help' => HelpCommand::class,
         '/support' => SupportCommand::class,
@@ -40,9 +40,9 @@ class CommandFactory
 
     public static function getCommandClass(string $command_name): string
     {
-        if (self::isPromoCode($command_name)) {
-            return PromoCommand::class;
-        }
+        // if (self::isPromoCode($command_name)) {
+        //     return PromoCommand::class;
+        // }
 
         return self::create($command_name);
     }

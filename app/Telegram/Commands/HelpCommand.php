@@ -35,7 +35,7 @@ class HelpCommand extends BaseCommand
                 ['text' => '💳 Купить подписку', 'callback_data' => '/buy'],
             ],
             [
-                ['text' => '🎁 Промокод', 'callback_data' => '/promo'],
+                // ['text' => '🎁 Промокод', 'callback_data' => '/promo'],
                 ['text' => '📝 Поддержка', 'callback_data' => '/support'],
             ],
         ];
