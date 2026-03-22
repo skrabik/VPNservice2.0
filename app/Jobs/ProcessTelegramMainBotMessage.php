@@ -183,7 +183,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
                 Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
 
-                $this->sendWelcomeMessage($customer, $vpnKey->access_key, $server->hostname);
+                $this->sendWelcomeMessage($customer, $vpnKey->access_key);
             } else {
                 Log::error('No server found');
 
@@ -216,12 +216,12 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         }
     }
 
-    private function sendWelcomeMessage(Customer $customer, string $access_url, string $server_name): void
+    private function sendWelcomeMessage(Customer $customer, string $access_url): void
     {
         try {
             $message = "🎉 <b>Добро пожаловать!</b>\n\n".
                 "✅ Вам автоматически предоставлен бесплатный VPN на <b>15 дней</b>\n".
-                "🔑 Ваш ключ VPN для сервера {$server_name}:\n\n".
+                "🔑 Ваш ключ VPN:\n\n".
                 "<code>{$access_url}</code>\n\n".
                 'Качайте приложение для подключения к VPN:';
 
