@@ -4,6 +4,7 @@ namespace App\Telegram\Helpers;
 
 use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Models\Plan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SendTelegramInvoicePaymentService
@@ -29,6 +30,23 @@ class SendTelegramInvoicePaymentService
     
         $response = Telegram::sendInvoice($invoicePayload);
 
+        $messageId = method_exists($response, 'getMessageId')
+            ? $response->getMessageId()
+            : data_get($response, 'message_id');
+
+        if ($messageId) {
+            Cache::put(
+                self::getInvoiceMessageCacheKey($customer_telegram_id),
+                $messageId,
+                now()->addHour()
+            );
+        }
+
         Log::info('SendTelegramInvoicePaymentService: invoice sent response', ['response' => $response]);
+    }
+
+    public static function getInvoiceMessageCacheKey(string $customer_telegram_id): string
+    {
+        return 'telegram_invoice_message_'.$customer_telegram_id;
     }
 }

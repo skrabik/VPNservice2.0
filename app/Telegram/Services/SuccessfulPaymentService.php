@@ -4,6 +4,8 @@ namespace App\Telegram\Services;
 
 use App\Models\Customer;
 use App\Models\Plan;
+use App\Telegram\Helpers\SendTelegramInvoicePaymentService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -56,6 +58,24 @@ class SuccessfulPaymentService
                 'currency' => 'XTR',
                 'transaction_id' => $successful_payment->getTelegramPaymentChargeId(),
             ]);
+
+            $invoiceMessageCacheKey = SendTelegramInvoicePaymentService::getInvoiceMessageCacheKey((string) $customer->telegram_id);
+            $invoiceMessageId = Cache::pull($invoiceMessageCacheKey);
+
+            if ($invoiceMessageId) {
+                try {
+                    Telegram::deleteMessage([
+                        'chat_id' => $customer->telegram_id,
+                        'message_id' => $invoiceMessageId,
+                    ]);
+                } catch (\Throwable $exception) {
+                    Log::warning('Failed to delete Telegram invoice message after successful payment', [
+                        'chat_id' => $customer->telegram_id,
+                        'message_id' => $invoiceMessageId,
+                        'message' => $exception->getMessage(),
+                    ]);
+                }
+            }
 
             $message = "🎉 <b>Подписка успешно активирована!</b>\n\n".
                 "✅ Ваша подписка на план <b>{$plan->title}</b> активна до {$new_subscription->date_end}\n\n".
