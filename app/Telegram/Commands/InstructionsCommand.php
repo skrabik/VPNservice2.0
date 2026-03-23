@@ -8,6 +8,10 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 
 class InstructionsCommand extends BaseCommand
 {
+    private const TYPE_ANDROID = 'android';
+
+    private const TYPE_IPHONE = 'iphone';
+
     public function handle(): void
     {
         TelegramCommandLog::create([
@@ -26,42 +30,92 @@ class InstructionsCommand extends BaseCommand
             'text' => $this->getInstructions(),
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
-            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::backToMainMenu('⬅️ Назад')),
+            'reply_markup' => $this->getInstructionsKeyboard(),
         ]);
     }
 
     private function getInstructions(): string
     {
-        return "⚡ <b>Инструкция по подключению к Xray (V2Ray)</b>\n\n".
-            "🔹 <b>Шаг 1: Скачивание приложения</b>\n".
-            "• Android: Скачайте V2RayNG из Google Play\n".
-            "• iOS: Скачайте V2RayX из App Store\n".
-            "• Windows: Скачайте V2RayN с GitHub\n".
-            "• Mac: Скачайте V2RayX с GitHub\n\n".
+        return match ($this->getInstructionType()) {
+            self::TYPE_ANDROID => $this->getAndroidInstructions(),
+            self::TYPE_IPHONE => $this->getIphoneInstructions(),
+            default => $this->getPlatformSelectionText(),
+        };
+    }
 
-            "🔹 <b>Шаг 2: Добавление сервера</b>\n".
-            "• Откройте приложение V2RayNG/V2RayX\n".
-            "• Нажмите \"+\" для добавления сервера\n".
-            "• Выберите способ импорта:\n".
-            "  - QR-код\n".
-            "  - Ссылка (vmess://, vless://, trojan://)\n".
-            "  - Ручной ввод\n\n".
+    private function getInstructionsKeyboard(): string
+    {
+        return match ($this->getInstructionType()) {
+            self::TYPE_ANDROID => TelegramKeyboard::inline([
+                [['text' => '🍎 Инструкция для iPhone', 'callback_data' => '/instructions?type=iphone']],
+                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
+            ]),
+            self::TYPE_IPHONE => TelegramKeyboard::inline([
+                [['text' => '🤖 Инструкция для Android', 'callback_data' => '/instructions?type=android']],
+                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
+            ]),
+            default => TelegramKeyboard::inline([
+                [['text' => '🤖 Android', 'callback_data' => '/instructions?type=android']],
+                [['text' => '🍎 iPhone', 'callback_data' => '/instructions?type=iphone']],
+                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
+            ]),
+        };
+    }
 
-            "🔹 <b>Шаг 3: Выбор протокола</b>\n".
-            "• VMess: Универсальный протокол\n".
-            "• VLESS: Легковесный протокол\n".
-            "• Trojan: Протокол с TLS шифрованием\n".
-            "• Выберите наиболее подходящий\n\n".
+    private function getInstructionType(): ?string
+    {
+        $type = strtolower((string) ($this->params['type'] ?? ''));
 
-            "🔹 <b>Шаг 4: Подключение</b>\n".
-            "• Выберите добавленный сервер\n".
-            "• Нажмите кнопку подключения\n".
-            "• Дождитесь установки соединения\n\n".
+        return in_array($type, [self::TYPE_ANDROID, self::TYPE_IPHONE], true) ? $type : null;
+    }
 
-            "💡 <b>Советы:</b>\n".
-            "• VMess рекомендуется для большинства случаев\n".
-            "• VLESS быстрее, но менее совместим\n".
-            "• Trojan лучше обходит блокировки\n".
-            '• Для получения конфигурации используйте /key';
+    private function getPlatformSelectionText(): string
+    {
+        return implode("\n", [
+            '📱 <b>Инструкции по подключению</b>',
+            '',
+            'Выберите ваше устройство ниже, и я покажу подходящую инструкцию по подключению VPN.',
+        ]);
+    }
+
+    private function getAndroidInstructions(): string
+    {
+        return implode("\n", [
+            '📱 <b>Установка на Android</b>',
+            '',
+            '1. <b>Установите приложение</b>',
+            'Скачайте <b>v2RayTun</b>:',
+            '👉 <a href="https://play.google.com/store/apps/details?id=com.v2raytun.android">Google Play</a>',
+            '👉 <a href="https://github.com/DigneZzZ/v2raytun/releases/download/5.19.64/v2RayTun_universal.apk">Скачать APK</a> <i>(если Google Play не работает)</i>',
+            '',
+            '2. <b>Добавьте подписку</b>',
+            'Ваш VPN-ключ уже отправлен ботом.',
+            'Скопируйте ключ из Telegram, откройте <b>v2RayTun</b> и добавьте его в приложение.',
+            '',
+            '3. <b>Подключитесь</b>',
+            'Откройте приложение, выберите добавленный профиль и включите VPN.',
+            '',
+            '💡 <b>Если Android попросит разрешение на VPN</b>, просто подтвердите запрос.',
+        ]);
+    }
+
+    private function getIphoneInstructions(): string
+    {
+        return implode("\n", [
+            '🍎 <b>Установка на iPhone</b>',
+            '',
+            '1. <b>Установите приложение</b>',
+            'Скачайте <b>Streisand</b>:',
+            '👉 <a href="https://apps.apple.com/us/app/streisand/id6450534064">App Store</a>',
+            '',
+            '2. <b>Добавьте подписку</b>',
+            'Ваш VPN-ключ уже отправлен ботом.',
+            'Скопируйте ключ из Telegram, откройте <b>Streisand</b> и добавьте его в приложение.',
+            '',
+            '3. <b>Подключитесь</b>',
+            'Откройте приложение, выберите добавленный профиль и включите VPN.',
+            '',
+            '💡 <b>Если iPhone попросит разрешение на VPN</b>, просто подтвердите запрос.',
+        ]);
     }
 }
