@@ -5,7 +5,7 @@ namespace App\Telegram\Commands;
 use App\Models\Customer;
 use App\Models\Server;
 use App\Models\TelegramCommandLog;
-use App\Services\VpnProviders\VpnAccessManager;
+use App\Services\CustomerVpnKeyService;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -71,7 +71,7 @@ class KeyCommand extends BaseCommand
 
     private function showServersList(): void
     {
-        $servers = Server::where('active', true)->get();
+        $servers = (new CustomerVpnKeyService)->getAvailableServers();
 
         if ($servers->isEmpty()) {
             $message = "❌ Нет доступных серверов.\n\n".
@@ -133,10 +133,7 @@ class KeyCommand extends BaseCommand
 
     private function showCurrentKey(): void
     {
-        $vpnKey = $this->customer->activeVpnKeys()
-            ->with('server')
-            ->latest('id')
-            ->first();
+        $vpnKey = (new CustomerVpnKeyService)->getCurrentKey($this->customer);
 
         if (! $vpnKey) {
             $message = "❌ У вас пока нет активного ключа VPN.\n\n".
@@ -223,6 +220,7 @@ class KeyCommand extends BaseCommand
     private function createKeyForServer(int $server_id): void
     {
         $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+        $vpnKeyService = new CustomerVpnKeyService;
 
         $progressPayload = [
             'chat_id' => $this->customer->telegram_id,
@@ -254,22 +252,8 @@ class KeyCommand extends BaseCommand
             return;
         }
 
-        $server->loadMissing(['defaultInbound', 'inbounds']);
-
-        $activeSubscription = null;
-
         try {
-            $accessManager = new VpnAccessManager;
-            $accessManager->deleteCustomerKeys($this->customer);
-
-            $activeSubscription = $this->customer->subscriptions()
-                ->where('date_end', '>', now())
-                ->latest('date_end')
-                ->first();
-
-            $vpnKey = $accessManager->createForCustomer($server, $this->customer, [
-                'expires_at' => $activeSubscription?->date_end,
-            ]);
+            $vpnKey = $vpnKeyService->createKeyForServer($this->customer, $server);
 
             Log::info('VPN key created successfully', [
                 'customer_id' => $this->customer->id,
@@ -288,8 +272,8 @@ class KeyCommand extends BaseCommand
                 'server_type' => $server->type,
                 'default_inbound_id' => $server->defaultInbound?->id,
                 'inbounds_count' => $server->inbounds->count(),
-                'subscription_id' => $activeSubscription?->id ?? null,
-                'subscription_date_end' => $activeSubscription?->date_end?->toDateTimeString(),
+                'subscription_id' => $this->customer->getActiveSubscription()?->id ?? null,
+                'subscription_date_end' => $this->customer->getActiveSubscription()?->date_end?->toDateTimeString(),
                 'message' => $exception->getMessage(),
                 'exception_class' => $exception::class,
                 'file' => $exception->getFile(),

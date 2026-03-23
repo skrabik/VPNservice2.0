@@ -3,7 +3,9 @@
 namespace App\Telegram\Services;
 
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\Plan;
+use App\Services\Payments\FinalizeSubscriptionPaymentService;
 use App\Telegram\Helpers\SendTelegramInvoicePaymentService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -46,17 +48,19 @@ class SuccessfulPaymentService
                 return;
             }
 
-            $new_subscription = $customer->subscriptions()->create([
-                'plan_id' => $plan->id,
-                'date_start' => now()->startOfDay(),
-                'date_end' => now()->endOfDay()->addDays($plan->period),
-            ]);
-
-            $customer->payments()->create([
-                'subscription_id' => $new_subscription->id,
+            FinalizeSubscriptionPaymentService::process($customer, $plan, [
                 'amount' => $plan->stars,
                 'currency' => 'XTR',
                 'transaction_id' => $successful_payment->getTelegramPaymentChargeId(),
+                'provider' => Payment::PROVIDER_TELEGRAM,
+                'payment_method' => Payment::METHOD_TELEGRAM_STARS,
+                'status' => Payment::STATUS_SUCCEEDED,
+                'external_payment_id' => $successful_payment->getTelegramPaymentChargeId(),
+                'payload' => [
+                    'provider_payment_charge_id' => $successful_payment->getProviderPaymentChargeId(),
+                    'telegram_payment_charge_id' => $successful_payment->getTelegramPaymentChargeId(),
+                    'invoice_payload' => $payload,
+                ],
             ]);
 
             $invoiceMessageCacheKey = SendTelegramInvoicePaymentService::getInvoiceMessageCacheKey((string) $customer->telegram_id);
@@ -77,17 +81,6 @@ class SuccessfulPaymentService
                 }
             }
 
-            $message = "🎉 <b>Подписка успешно активирована!</b>\n\n".
-                "✅ Ваша подписка на план <b>{$plan->title}</b> активна до {$new_subscription->date_end}\n\n".
-                "🔑 Теперь вы можете получить ключ VPN, используя команду:\n".
-                "/key\n\n".
-                'После получения ключа следуйте инструкциям по подключению к VPN серверу.';
-
-            Telegram::sendMessage([
-                'chat_id' => $customer->telegram_id,
-                'text' => $message,
-                'parse_mode' => 'HTML',
-            ]);
         } catch (\Exception $ex) {
             Log::error('Error processing successful payment: '.$ex->getMessage());
 

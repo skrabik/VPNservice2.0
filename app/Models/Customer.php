@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Orchid\Filters\Filterable;
 
-class Customer extends Model
+class Customer extends Authenticatable
 {
     use Filterable, HasFactory, SoftDeletes;
 
@@ -105,9 +105,7 @@ class Customer extends Model
      */
     public function hasActiveSubscription(): bool
     {
-        return $this->subscriptions()
-            ->where('date_end', '>', now())
-            ->exists();
+        return $this->getActiveSubscription() !== null;
     }
 
     public function subscriptions(): HasMany
@@ -115,9 +113,29 @@ class Customer extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function getActiveSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->where('date_end', '>', now())
+            ->latest('date_end')
+            ->first();
+    }
+
+    public function getLatestSubscriptionByEndDate(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->latest('date_end')
+            ->first();
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
     }
 
     public function pending_actions(): HasMany

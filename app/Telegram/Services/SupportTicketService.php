@@ -3,7 +3,7 @@
 namespace App\Telegram\Services;
 
 use App\Models\Customer;
-use App\Models\SupportTicket;
+use App\Services\CustomerSupportService;
 use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -14,10 +14,7 @@ class SupportTicketService
     {
         $message = $update->getMessage()->getText();
 
-        SupportTicket::create([
-            'customer_id' => $customer->id,
-            'message' => $message,
-        ]);
+        (new CustomerSupportService)->createTicket($customer, $message);
 
         Telegram::sendMessage([
             'chat_id' => $customer->telegram_id,

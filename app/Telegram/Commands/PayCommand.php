@@ -2,11 +2,14 @@
 
 namespace App\Telegram\Commands;
 
+use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\TelegramCommandLog;
+use App\Services\Payments\YooKassaPaymentService;
+use App\Telegram\Helpers\SendTelegramInvoicePaymentService;
+use App\Telegram\TelegramKeyboard;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
-use App\Telegram\Helpers\SendTelegramInvoicePaymentService;
 
 class PayCommand extends BaseCommand
 {
@@ -25,41 +28,6 @@ class PayCommand extends BaseCommand
             'action' => 'Вызвал команду /pay',
         ]);
 
-        if ($this->customer->hasActiveSubscription()) {
-            $subscription = $this->customer->subscriptions()->latest()->first();
-
-            Log::info('PayCommand aborted because subscription is already active', [
-                'customer_id' => $this->customer->id,
-                'subscription_id' => $subscription?->id,
-                'date_end' => $subscription?->date_end?->toDateTimeString(),
-            ]);
-
-            $message = "✅ У вас уже есть активная подписка!\n\n".
-                "Дата окончания: {$subscription->date_end}\n\n".
-                'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
-
-            $keyboard = [
-                [['text' => '❓ Помощь', 'callback_data' => '/help']],
-            ];
-
-            Log::info('PayCommand test mode: skipped Telegram::sendMessage for active subscription notice', [
-                'customer_id' => $this->customer->id,
-                'chat_id' => $this->customer->telegram_id,
-                'text' => $message,
-            ]);
-
-            Telegram::sendMessage([
-                'chat_id' => $this->customer->telegram_id,
-                'text' => $message,
-                'parse_mode' => 'HTML',
-                'reply_markup' => json_encode([
-                    'inline_keyboard' => $keyboard,
-                ]),
-            ]);
-
-            return;
-        }
-
         TelegramCommandLog::create([
             'customer_id' => $this->customer->id,
             'command_name' => 'процессим платеж',
@@ -76,26 +44,146 @@ class PayCommand extends BaseCommand
             'plan_stars' => $plan->stars,
         ]);
 
-        $this->processPayment($plan);
+        $activeSubscription = $this->customer->getActiveSubscription();
+
+        if ($activeSubscription) {
+            $message = "⚠️ У вас уже есть активная подписка до <b>{$activeSubscription->date_end->format('d.m.Y H:i')}</b>.\n\n".
+                "Новая оплата не создаст вторую отдельную подписку, а <b>продлит текущую</b> ещё на {$plan->period} дней.";
+
+            Telegram::sendMessage([
+                'chat_id' => $this->customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+            ]);
+        }
+
+        $method = $this->params['method'] ?? null;
+
+        if (! is_string($method) || $method === '') {
+            $this->showPaymentMethodSelection($plan);
+
+            return;
+        }
+
+        match ($method) {
+            'stars' => $this->processTelegramStarsPayment($plan),
+            'yookassa' => $this->processYooKassaPayment($plan),
+            default => $this->showPaymentMethodSelection($plan, '❌ Не удалось определить способ оплаты. Выберите вариант ниже.'),
+        };
     }
 
-    private function processPayment(Plan $plan): void
+    private function showPaymentMethodSelection(Plan $plan, ?string $prefixMessage = null): void
     {
-        if ($this->update->getCallbackQuery()) {
-            $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+        $this->deleteCallbackMessageIfExists();
 
-            Log::info('PayCommand test mode: skipped Telegram::deleteMessage before invoice', [
-                'customer_id' => $this->customer->id,
+        $message = $prefixMessage ? $prefixMessage."\n\n" : '';
+        $message .= "Выберите способ оплаты для тарифа <b>{$plan->title}</b>.\n\n".
+            "⭐ Telegram Stars: мгновенная оплата внутри Telegram.\n".
+            "💳 ЮKassa: оплата на защищенной странице ЮKassa.";
+
+        Telegram::sendMessage([
+            'chat_id' => $this->customer->telegram_id,
+            'text' => $message,
+            'parse_mode' => 'HTML',
+            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::paymentMethods()),
+        ]);
+    }
+
+    private function processTelegramStarsPayment(Plan $plan): void
+    {
+        $this->deleteCallbackMessageIfExists();
+
+        SendTelegramInvoicePaymentService::sendInvoice($this->customer->telegram_id, $plan);
+    }
+
+    private function processYooKassaPayment(Plan $plan): void
+    {
+        $this->deleteCallbackMessageIfExists();
+
+        try {
+            $payment = app(YooKassaPaymentService::class)->createHostedPayment($this->customer, $plan);
+            $paymentId = (string) ($payment['id'] ?? '');
+            $confirmationUrl = (string) data_get($payment, 'confirmation.confirmation_url', '');
+
+            if ($paymentId === '' || $confirmationUrl === '') {
+                throw new \RuntimeException('YooKassa payment response is incomplete.');
+            }
+
+            Payment::query()->updateOrCreate(
+                [
+                    'provider' => Payment::PROVIDER_YOOKASSA,
+                    'external_payment_id' => $paymentId,
+                ],
+                [
+                    'customer_id' => $this->customer->id,
+                    'subscription_id' => null,
+                    'amount' => data_get($payment, 'amount.value', $plan->price),
+                    'currency' => data_get($payment, 'amount.currency', 'RUB'),
+                    'transaction_id' => $paymentId,
+                    'payment_method' => (string) data_get($payment, 'payment_method.type', Payment::METHOD_YOOKASSA_REDIRECT),
+                    'status' => (string) data_get($payment, 'status', Payment::STATUS_PENDING),
+                    'payload' => $payment,
+                ]
+            );
+
+            Telegram::sendMessage([
                 'chat_id' => $this->customer->telegram_id,
-                'message_id' => $message_id,
+                'text' => "💳 <b>Оплата через ЮKassa</b>\n\n".
+                    "Тариф: <b>{$plan->title}</b>\n".
+                    "Сумма: <b>{$plan->price} RUB</b>\n\n".
+                    'Нажмите на кнопку ниже, чтобы перейти к оплате. После подтверждения платежа подписка активируется автоматически.',
+                'parse_mode' => 'HTML',
+                'reply_markup' => TelegramKeyboard::inline([
+                    [
+                        ['text' => 'Перейти к оплате', 'url' => $confirmationUrl],
+                    ],
+                    [
+                        ['text' => '⭐ Оплатить Stars', 'callback_data' => '/pay?method=stars'],
+                    ],
+                    TelegramKeyboard::backToMainMenu('🏠 Главное меню')[0],
+                ]),
+            ]);
+        } catch (\Throwable $exception) {
+            Log::error('Failed to create YooKassa payment', [
+                'customer_id' => $this->customer->id,
+                'plan_id' => $plan->id,
+                'message' => $exception->getMessage(),
             ]);
 
+            Telegram::sendMessage([
+                'chat_id' => $this->customer->telegram_id,
+                'text' => '❌ Не удалось создать ссылку на оплату через ЮKassa. Попробуйте позже или выберите Telegram Stars.',
+                'parse_mode' => 'HTML',
+                'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::paymentMethods()),
+            ]);
+        }
+    }
+
+    private function deleteCallbackMessageIfExists(): void
+    {
+        if (! $this->update->getCallbackQuery()) {
+            return;
+        }
+
+        $message_id = $this->update->getCallbackQuery()->getMessage()->getMessageId();
+
+        Log::info('PayCommand deleting callback source message', [
+            'customer_id' => $this->customer->id,
+            'chat_id' => $this->customer->telegram_id,
+            'message_id' => $message_id,
+        ]);
+
+        try {
             Telegram::deleteMessage([
                 'chat_id' => $this->customer->telegram_id,
                 'message_id' => $message_id,
             ]);
+        } catch (\Throwable $exception) {
+            Log::warning('PayCommand failed to delete callback source message', [
+                'customer_id' => $this->customer->id,
+                'message_id' => $message_id,
+                'message' => $exception->getMessage(),
+            ]);
         }
-
-        SendTelegramInvoicePaymentService::sendInvoice($this->customer->telegram_id, $plan);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Telegram\Services;
 
 use App\Models\Customer;
 use App\Models\TelegramCommandLog;
-use App\Telegram\TelegramKeyboard;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -16,33 +15,16 @@ class PreCheckoutQueryService
         try {
             $pre_checkout_query = $update->getPreCheckoutQuery();
 
-            if ($customer->hasActiveSubscription()) {
-                $subscription = $customer->subscriptions()->latest()->first();
-
-                $message = "✅ У вас уже есть активная подписка!\n\n".
-                    "Дата окончания: {$subscription->date_end}\n\n".
-                    'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
-
-                Telegram::sendMessage([
-                    'chat_id' => $customer->telegram_id,
-                    'text' => $message,
-                    'parse_mode' => 'HTML',
-                    'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
-                ]);
-
-                Telegram::answerPreCheckoutQuery([
-                    'pre_checkout_query_id' => $pre_checkout_query->getId(),
-                    'ok' => false,
-                    'error_message' => 'У вас есть активная подписка',
-                ]);
-
-                return;
-            }
-
             TelegramCommandLog::create([
                 'customer_id' => $customer->id,
                 'command_name' => 'pre_checkout_query',
                 'action' => 'Пользователь начал оплату подписки',
+            ]);
+
+            Log::info('Pre-checkout approved for subscription payment', [
+                'customer_id' => $customer->id,
+                'telegram_id' => $customer->telegram_id,
+                'has_active_subscription' => $customer->hasActiveSubscription(),
             ]);
 
             Telegram::answerPreCheckoutQuery([

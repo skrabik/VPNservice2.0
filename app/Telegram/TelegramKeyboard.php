@@ -39,6 +39,19 @@ class TelegramKeyboard
         ];
     }
 
+    public static function paymentMethods(): array
+    {
+        return [
+            [
+                ['text' => '⭐ Telegram Stars', 'callback_data' => '/pay?method=stars'],
+            ],
+            [
+                ['text' => '💳 ЮKassa', 'callback_data' => '/pay?method=yookassa'],
+            ],
+            self::backToMainMenu('⬅️ Назад')[0],
+        ];
+    }
+
     public static function backToMainMenu(string $text = '🏠 Главное меню'): array
     {
         return [[

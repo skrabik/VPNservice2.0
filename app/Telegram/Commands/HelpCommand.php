@@ -4,6 +4,7 @@ namespace App\Telegram\Commands;
 
 use App\Models\Customer;
 use App\Models\TelegramCommandLog;
+use App\Services\CustomerCabinetLinkService;
 use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -26,11 +27,18 @@ class HelpCommand extends BaseCommand
         $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
                   "Доступные разделы:";
 
+        $keyboard = TelegramKeyboard::mainMenu();
+        $claimUrl = (new CustomerCabinetLinkService)->getClaimUrl($this->customer);
+
+        if ($claimUrl) {
+            $keyboard[] = [['text' => '🌐 Открыть веб-кабинет', 'url' => $claimUrl]];
+        }
+
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
-            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
+            'reply_markup' => TelegramKeyboard::inline($keyboard),
         ]);
     }
 }

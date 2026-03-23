@@ -3,6 +3,7 @@
 namespace App\Telegram\Commands;
 
 use App\Models\TelegramCommandLog;
+use App\Services\CustomerStatusService;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class StatusCommand extends BaseCommand
@@ -15,9 +16,10 @@ class StatusCommand extends BaseCommand
             'action' => 'Вызвал команду /status',
         ]);
 
-        $subscription = $this->customer->subscriptions()->latest()->first();
+        $overview = (new CustomerStatusService)->getOverview($this->customer);
+        $subscription = $overview['subscription'];
 
-        if (! $subscription || $subscription->date_end < now()) {
+        if (! $overview['has_active_subscription']) {
             $message = "❌ У вас нет активной подписки!\n\n".
                 "Для использования VPN необходимо оформить подписку.\n\n".
                 'Нажмите кнопку ниже, чтобы перейти к оплате.';
@@ -39,13 +41,10 @@ class StatusCommand extends BaseCommand
             return;
         }
 
-        $days_left = now()->diffInDays($subscription->date_end, false);
-        $hours_left = now()->diffInHours($subscription->date_end, false) % 24;
-
-        $days_left = round($days_left);
-
-        $status_icon = $days_left > 7 ? '✅' : ($days_left > 3 ? '⚠️' : '🔴');
-        $status_text = $days_left > 7 ? 'Активна' : ($days_left > 3 ? 'Заканчивается' : 'Истекает');
+        $days_left = $overview['days_left'];
+        $hours_left = $overview['hours_left'];
+        $status_icon = $overview['status_icon'];
+        $status_text = $overview['status_text'];
 
         $message = "📊 <b>Статус подписки</b>\n\n".
             "{$status_icon} Статус: <b>{$status_text}</b>\n".
@@ -60,7 +59,7 @@ class StatusCommand extends BaseCommand
             $message .= "⏰ Подписка истекла\n\n";
         }
 
-        $active_keys = $this->customer->activeVpnKeys()->count();
+        $active_keys = $overview['active_keys_count'];
         $message .= "🔑 Активных ключей VPN: <b>{$active_keys}</b>\n\n";
 
         if ($days_left > 0) {

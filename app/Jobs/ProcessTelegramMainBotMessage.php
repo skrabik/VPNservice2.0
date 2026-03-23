@@ -4,15 +4,12 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Models\CustomerPendingAction;
-use App\Models\Plan;
-use App\Models\Server;
-use App\Models\Subscription;
+use App\Services\CustomerOnboardingService;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
 use App\Telegram\Services\SuccessfulPaymentService;
 use App\Telegram\Services\SupportTicketService;
 use App\Telegram\TelegramManager;
-use App\Services\VpnProviders\VpnAccessManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,8 +22,6 @@ use Telegram\Bot\Objects\Update;
 class ProcessTelegramMainBotMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private const PROMO_PERIOD_DAYS = 15;
 
     protected array $jsonData;
 
@@ -134,28 +129,11 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     private function createWelcomeSubscription(Customer $customer): void
     {
         try {
-            $promo_plan = Plan::updateOrCreate(
-                ['slug' => 'promo'],
-                [
-                    'title' => 'Промо план',
-                    'description' => 'Бесплатный план на 15 дней для новых пользователей',
-                    'price' => 0,
-                    'stars' => 1,
-                    'period' => self::PROMO_PERIOD_DAYS,
-                    'active' => true,
-                ]
-            );
+            $subscription = (new CustomerOnboardingService)->createWelcomeSubscription($customer);
 
             Log::info('Promo plan ensured for welcome subscription', [
-                'plan_id' => $promo_plan->id,
-                'period' => $promo_plan->period,
-            ]);
-
-            Subscription::create([
-                'customer_id' => $customer->id,
-                'plan_id' => $promo_plan->id,
-                'date_start' => now(),
-                'date_end' => now()->addDays(self::PROMO_PERIOD_DAYS),
+                'plan_id' => $subscription->plan_id,
+                'period' => $subscription->date_start?->diffInDays($subscription->date_end),
             ]);
 
             Log::info('Created welcome subscription for new customer', ['customer_id' => $customer->id]);
@@ -184,21 +162,9 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     private function createWelcomeVpnKey(Customer $customer): void
     {
         try {
-            $server = Server::query()
-                ->where('active', true)
-                ->orderByDesc('id')
-                ->first();
+            $vpnKey = (new CustomerOnboardingService)->createWelcomeVpnKey($customer);
 
-            if ($server) {
-                $activeSubscription = $customer->subscriptions()
-                    ->where('date_end', '>', now())
-                    ->latest('date_end')
-                    ->first();
-
-                $vpnKey = (new VpnAccessManager)->createForCustomer($server, $customer, [
-                    'expires_at' => $activeSubscription?->date_end,
-                ]);
-
+            if ($vpnKey) {
                 Log::info('Created welcome VPN key for new customer', ['customer_id' => $customer->id]);
 
                 $this->sendWelcomeMessage($customer, $vpnKey->access_key);
@@ -243,7 +209,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 "<code>{$access_url}</code>\n\n".
                 'Качайте приложение для подключения к VPN:';
 
-            $keyboard = $this->buildAppsKeyboard();
+            $keyboard = $this->buildAppsKeyboard($customer);
 
             Telegram::sendMessage([
                 'chat_id' => $customer->telegram_id,
@@ -256,7 +222,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
             Telegram::sendMessage([
                 'chat_id' => $customer->telegram_id,
-                'text' => '📱 Инструкции по подключению',
+                'text' => '📱 Инструкции по подключению:',
                 'parse_mode' => 'HTML',
                 'reply_markup' => json_encode([
                     'inline_keyboard' => [
@@ -274,13 +240,27 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         }
     }
 
-    private function buildAppsKeyboard(): array
+    private function buildAppsKeyboard(Customer $customer): array
     {
-        return [
-            [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=com.v2raytun.android']],
-            [['text' => '🍎 iPhone', 'url' => 'https://apps.apple.com/us/app/streisand/id6450534064']],
-            [['text' => '🪟 Windows', 'url' => 'https://storage.v2raytun.com/v2RayTun_Setup.exe']],
-            [['text' => '🖥️ macOS', 'url' => 'https://apps.apple.com/en/app/v2raytun/id6476628951']],
-        ];
+        $keyboard = [];
+        $onboardingService = new CustomerOnboardingService;
+
+        foreach ($onboardingService->getWelcomeAppLinks() as $platform) {
+            $keyboard[] = [[
+                'text' => $platform['icon'].' '.$platform['label'],
+                'url' => $platform['download_url'],
+            ]];
+        }
+
+        $claimUrl = $onboardingService->getClaimUrl($customer);
+
+        if ($claimUrl) {
+            $keyboard[] = [[
+                'text' => '🌐 Активировать веб-кабинет',
+                'url' => $claimUrl,
+            ]];
+        }
+
+        return $keyboard;
     }
 }
