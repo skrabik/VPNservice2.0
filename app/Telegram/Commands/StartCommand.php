@@ -21,11 +21,12 @@ class StartCommand extends BaseCommand
             'Выберите нужную опцию:';
 
         $keyboard = TelegramKeyboard::mainMenu();
-        $claimUrl = (new CustomerCabinetLinkService)->getClaimUrl($this->customer);
+        $cabinetLinkService = new CustomerCabinetLinkService;
 
-        if ($claimUrl) {
-            $keyboard[] = [['text' => '🌐 Открыть веб-кабинет', 'url' => $claimUrl]];
-        }
+        $keyboard[] = [[
+            'text' => '🌐 Открыть веб-кабинет',
+            'web_app' => ['url' => $cabinetLinkService->getMiniAppUrl()],
+        ]];
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,

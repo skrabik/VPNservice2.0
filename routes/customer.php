@@ -6,12 +6,14 @@ use App\Http\Controllers\Customer\SupportController;
 use App\Http\Controllers\CustomerAuth\AuthenticatedSessionController;
 use App\Http\Controllers\CustomerAuth\ClaimRegistrationController;
 use App\Http\Controllers\CustomerAuth\RegisteredUserController;
+use App\Http\Controllers\CustomerAuth\TelegramAuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('account')->name('customer.')->group(function () {
     Route::middleware('customer.guest')->group(function () {
         Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+        Route::post('telegram-login', [TelegramAuthenticatedSessionController::class, 'store'])->name('telegram.store');
 
         Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
         Route::post('register', [RegisteredUserController::class, 'store'])->name('register.store');

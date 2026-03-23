@@ -66,4 +66,86 @@ class CustomerCabinetAuthTest extends TestCase
         $this->assertSame('claimed@example.com', $customer->email);
         $this->assertTrue(Hash::check('Password123!', $customer->password));
     }
+
+    public function test_existing_customer_can_sign_in_via_telegram_init_data(): void
+    {
+        config(['telegram.bots.main.token' => 'test-bot-token']);
+
+        $customer = Customer::query()->create([
+            'first_name' => 'Roman',
+            'telegram_id' => '777',
+        ]);
+
+        $response = $this->post(route('customer.telegram.store'), [
+            'init_data' => $this->makeTelegramInitData([
+                'id' => 777,
+                'first_name' => 'Roman',
+                'username' => 'roman_user',
+            ]),
+        ]);
+
+        $this->assertAuthenticated('customer');
+        $response->assertRedirect(route('customer.dashboard'));
+
+        $customer->refresh();
+
+        $this->assertSame('roman_user', $customer->telegram_username);
+    }
+
+    public function test_new_customer_can_sign_in_via_telegram_init_data_and_be_created(): void
+    {
+        config(['telegram.bots.main.token' => 'test-bot-token']);
+
+        $response = $this->post(route('customer.telegram.store'), [
+            'init_data' => $this->makeTelegramInitData([
+                'id' => 999,
+                'first_name' => 'Mini',
+                'last_name' => 'App',
+                'username' => 'mini_app_user',
+            ]),
+        ]);
+
+        $this->assertAuthenticated('customer');
+        $response->assertRedirect(route('customer.dashboard'));
+        $this->assertDatabaseHas('customers', [
+            'telegram_id' => '999',
+            'telegram_username' => 'mini_app_user',
+            'first_name' => 'Mini',
+        ]);
+        $this->assertDatabaseCount('subscriptions', 1);
+    }
+
+    public function test_telegram_login_rejects_invalid_signature(): void
+    {
+        config(['telegram.bots.main.token' => 'test-bot-token']);
+
+        $response = $this->from(route('customer.login'))
+            ->post(route('customer.telegram.store'), [
+                'init_data' => 'user=%7B%22id%22%3A1%7D&auth_date=123456&hash=invalid',
+            ]);
+
+        $response->assertRedirect(route('customer.login'));
+        $response->assertSessionHasErrors('telegram');
+        $this->assertGuest('customer');
+    }
+
+    private function makeTelegramInitData(array $user): string
+    {
+        $payload = [
+            'auth_date' => (string) now()->timestamp,
+            'query_id' => 'AAEAAAE',
+            'user' => json_encode($user, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        ];
+
+        ksort($payload);
+
+        $dataCheckString = collect($payload)
+            ->map(fn ($value, $key) => $key.'='.$value)
+            ->implode("\n");
+
+        $secretKey = hash_hmac('sha256', (string) config('telegram.bots.main.token'), 'WebAppData', true);
+        $payload['hash'] = hash_hmac('sha256', $dataCheckString, $secretKey);
+
+        return http_build_query($payload);
+    }
 }

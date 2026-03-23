@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Models\CustomerPendingAction;
+use App\Services\CustomerCabinetLinkService;
 use App\Services\CustomerOnboardingService;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
@@ -244,6 +245,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     {
         $keyboard = [];
         $onboardingService = new CustomerOnboardingService;
+        $cabinetLinkService = new CustomerCabinetLinkService;
 
         foreach ($onboardingService->getWelcomeAppLinks() as $platform) {
             $keyboard[] = [[
@@ -252,11 +254,16 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
             ]];
         }
 
+        $keyboard[] = [[
+            'text' => '🌐 Открыть веб-кабинет',
+            'web_app' => ['url' => $cabinetLinkService->getMiniAppUrl()],
+        ]];
+
         $claimUrl = $onboardingService->getClaimUrl($customer);
 
         if ($claimUrl) {
             $keyboard[] = [[
-                'text' => '🌐 Активировать веб-кабинет',
+                'text' => '✉️ Завершить регистрацию в браузере',
                 'url' => $claimUrl,
             ]];
         }

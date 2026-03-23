@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ $title ?? 'Личный кабинет' }}</title>
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-slate-950 text-slate-100">
@@ -53,5 +54,17 @@
             {{ $slot ?? '' }}
             @yield('content')
         </main>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const webApp = window.Telegram?.WebApp;
+
+                if (!webApp) {
+                    return;
+                }
+
+                webApp.ready();
+                webApp.expand();
+            });
+        </script>
     </body>
 </html>

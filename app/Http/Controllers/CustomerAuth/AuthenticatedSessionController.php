@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CustomerAuth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Services\CustomerCabinetLinkService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +14,16 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function __construct(
+        private readonly CustomerCabinetLinkService $cabinetLinkService,
+    ) {}
+
     public function create(): View
     {
-        return view('customer.auth.login');
+        return view('customer.auth.login', [
+            'botUrl' => $this->cabinetLinkService->getBotUrl(),
+            'miniAppUrl' => $this->cabinetLinkService->getMiniAppUrl(),
+        ]);
     }
 
     /**

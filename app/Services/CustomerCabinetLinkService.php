@@ -35,4 +35,9 @@ class CustomerCabinetLinkService
 
         return 'https://t.me/quantum_shield_bot';
     }
+
+    public function getMiniAppUrl(): string
+    {
+        return route('customer.login', ['source' => 'telegram'], true);
+    }
 }
