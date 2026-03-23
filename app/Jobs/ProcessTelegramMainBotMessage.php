@@ -167,6 +167,20 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         }
     }
 
+    private function answerCallbackQuery(string $callbackQueryId): void
+    {
+        try {
+            Telegram::answerCallbackQuery([
+                'callback_query_id' => $callbackQueryId,
+            ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to answer Telegram callback query', [
+                'callback_query_id' => $callbackQueryId,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
     private function createWelcomeVpnKey(Customer $customer): void
     {
         try {
@@ -240,6 +254,13 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 ]),
             ]);
 
+            Telegram::sendMessage([
+                'chat_id' => $customer->telegram_id,
+                'text' => '📱 Инструкции по подключению',
+                'parse_mode' => 'HTML',
+                'reply_markup' => [['text' => 'Открыть', 'callback_data' => '/instructions']],
+            ]);
+
             Log::info('Sent welcome message to new customer', ['customer_id' => $customer->id]);
         } catch (\Exception $e) {
             Log::error('Error sending welcome message', [
@@ -249,27 +270,13 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         }
     }
 
-    private function answerCallbackQuery(string $callbackQueryId): void
-    {
-        try {
-            Telegram::answerCallbackQuery([
-                'callback_query_id' => $callbackQueryId,
-            ]);
-        } catch (\Throwable $exception) {
-            Log::warning('Failed to answer Telegram callback query', [
-                'callback_query_id' => $callbackQueryId,
-                'message' => $exception->getMessage(),
-            ]);
-        }
-    }
-
     private function buildAppsKeyboard(): array
     {
         return [
-            [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=com.v2ray.ang']],
-            [['text' => '🍎 iOS', 'url' => 'https://apps.apple.com/us/app/streisand/id6450534064']],
-            [['text' => '🪟 Windows', 'url' => 'https://github.com/2dust/v2rayN/releases']],
-            [['text' => '🖥️ macOS', 'url' => 'https://github.com/yichengchen/clashX/releases']],
+            [['text' => '🤖 Android', 'url' => 'https://play.google.com/store/apps/details?id=com.v2raytun.android']],
+            [['text' => '🍎 iPhone', 'url' => 'https://apps.apple.com/us/app/streisand/id6450534064']],
+            [['text' => '🪟 Windows', 'url' => 'https://storage.v2raytun.com/v2RayTun_Setup.exe']],
+            [['text' => '🖥️ macOS', 'url' => 'https://apps.apple.com/en/app/v2raytun/id6476628951']],
         ];
     }
 }
