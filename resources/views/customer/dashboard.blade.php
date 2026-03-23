@@ -57,9 +57,7 @@
             <h2 class="text-xl font-semibold text-white">Текущий ключ</h2>
             @if ($overview['current_key'])
                 <p class="mt-4 text-sm text-slate-400">Сервер: {{ $overview['current_key']->server?->hostname ?? 'Неизвестный сервер' }}</p>
-                <div class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 font-mono text-sm text-emerald-300">
-                    {{ $overview['current_key']->access_key }}
-                </div>
+                <x-vpn-key-display :value="$overview['current_key']->access_key" />
             @else
                 <p class="mt-4 text-slate-300">Активного ключа пока нет. Создайте его на странице VPN-ключей.</p>
             @endif

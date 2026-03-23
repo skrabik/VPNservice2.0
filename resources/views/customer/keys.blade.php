@@ -11,9 +11,7 @@
                 <div class="mt-6 rounded-2xl bg-slate-800 p-5">
                     <p class="text-sm text-slate-400">Текущий ключ</p>
                     <p class="mt-2 text-sm text-slate-300">Сервер: {{ $currentKey->server?->hostname ?? 'Неизвестный сервер' }}</p>
-                    <div class="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 font-mono text-sm text-emerald-300">
-                        {{ $currentKey->access_key }}
-                    </div>
+                    <x-vpn-key-display :value="$currentKey->access_key" />
                 </div>
             @else
                 <div class="mt-6 rounded-2xl border border-slate-700 bg-slate-800 p-5 text-slate-300">

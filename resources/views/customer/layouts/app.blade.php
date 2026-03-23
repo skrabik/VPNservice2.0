@@ -59,12 +59,67 @@
                 const webApp = window.Telegram?.WebApp;
 
                 if (!webApp) {
+                    bindCopyButtons();
                     return;
                 }
 
                 webApp.ready();
                 webApp.expand();
+                bindCopyButtons();
             });
+
+            function bindCopyButtons() {
+                const fallbackCopy = (text) => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.setAttribute('readonly', '');
+                    textArea.style.position = 'absolute';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                };
+
+                const copyText = async (text) => {
+                    if (navigator.clipboard?.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        return;
+                    }
+
+                    fallbackCopy(text);
+                };
+
+                document.querySelectorAll('[data-copy-vpn-key]').forEach((button) => {
+                    if (button.dataset.copyBound === 'true') {
+                        return;
+                    }
+
+                    button.dataset.copyBound = 'true';
+
+                    button.addEventListener('click', async () => {
+                        const text = button.dataset.copyText ?? '';
+                        const defaultTitle = button.dataset.copyDefaultTitle ?? 'Скопировать';
+                        const successTitle = button.dataset.copySuccessTitle ?? 'Скопировано';
+
+                        try {
+                            await copyText(text);
+                            button.title = successTitle;
+                            button.setAttribute('aria-label', successTitle);
+                            button.classList.add('border-emerald-400', 'text-emerald-300');
+
+                            window.setTimeout(() => {
+                                button.title = defaultTitle;
+                                button.setAttribute('aria-label', defaultTitle);
+                                button.classList.remove('border-emerald-400', 'text-emerald-300');
+                            }, 1600);
+                        } catch (error) {
+                            button.title = 'Не удалось скопировать';
+                            button.setAttribute('aria-label', 'Не удалось скопировать');
+                        }
+                    });
+                });
+            }
         </script>
     </body>
 </html>
