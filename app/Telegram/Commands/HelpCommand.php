@@ -26,22 +26,11 @@ class HelpCommand extends BaseCommand
         $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
                   "Доступные разделы:";
 
-        $this->sendBottomMenuKeyboard();
-
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
             'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
-        ]);
-    }
-
-    private function sendBottomMenuKeyboard(): void
-    {
-        Telegram::sendMessage([
-            'chat_id' => $this->customer->telegram_id,
-            'text' => 'Если нижняя кнопка пропала, она восстановлена.',
-            'reply_markup' => TelegramKeyboard::reply(TelegramKeyboard::bottomMenuButton(), true),
         ]);
     }
 }
