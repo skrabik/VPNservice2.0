@@ -258,7 +258,11 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 'chat_id' => $customer->telegram_id,
                 'text' => '📱 Инструкции по подключению',
                 'parse_mode' => 'HTML',
-                'reply_markup' => [['text' => 'Открыть', 'callback_data' => '/instructions']],
+                'reply_markup' => json_encode([
+                    'inline_keyboard' => [
+                        [['text' => 'Открыть', 'callback_data' => '/instructions']],
+                    ],
+                ], JSON_UNESCAPED_UNICODE),
             ]);
 
             Log::info('Sent welcome message to new customer', ['customer_id' => $customer->id]);
