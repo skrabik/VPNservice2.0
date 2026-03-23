@@ -4,6 +4,7 @@ namespace App\Telegram\Commands;
 
 use App\Models\CustomerPendingAction;
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class SupportCommand extends BaseCommand
@@ -23,19 +24,11 @@ class SupportCommand extends BaseCommand
         $message = "📝 <b>Создание тикета поддержки</b>\n\n".
                   'Пожалуйста, введите ваше сообщение:';
 
-        $keyboard = [
-            ['❌ Отмена'],
-        ];
-
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
-            'reply_markup' => json_encode([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
-            ]),
+            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::supportCancel()),
         ]);
     }
 }

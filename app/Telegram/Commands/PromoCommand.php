@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramManager;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
 
@@ -26,7 +27,7 @@ class PromoCommand extends BaseCommand
             'action' => 'Вызвал команду /promo',
         ]);
 
-        $message = trim($this->update->getMessage()->getText());
+        $message = trim((string) TelegramManager::getMessageData($this->update));
 
         if ($message === '/promo' || $message === '🎁 Ввести промокод') {
 
@@ -35,7 +36,7 @@ class PromoCommand extends BaseCommand
                 '💡 Промокоды можно использовать многократно.';
 
             $keyboard = [
-                [['text' => '⬅️ Назад', 'callback_data' => 'start']],
+                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
             ];
 
             Telegram::sendMessage([
@@ -109,7 +110,7 @@ class PromoCommand extends BaseCommand
         $keyboard = [
             [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']],
             [['text' => '📊 Статус подписки', 'callback_data' => '/status']],
-            [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+            [['text' => '🏠 Главное меню', 'callback_data' => '/start']],
         ];
 
         Telegram::sendMessage([
@@ -134,7 +135,7 @@ class PromoCommand extends BaseCommand
     {
         $keyboard = [
             [['text' => '🔄 Попробовать снова', 'callback_data' => '/promo']],
-            [['text' => '⬅️ Назад', 'callback_data' => 'start']],
+            [['text' => '⬅️ Назад', 'callback_data' => '/start']],
         ];
 
         Telegram::sendMessage([

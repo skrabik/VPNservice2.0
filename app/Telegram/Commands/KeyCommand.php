@@ -31,8 +31,8 @@ class KeyCommand extends BaseCommand
                 'Нажмите кнопку ниже, чтобы перейти к оплате.';
 
             $keyboard = [
-                ['💳 Оплатить подписку'],
-                ['❓ Помощь'],
+                [['text' => '💳 Оплатить подписку', 'callback_data' => '/pay']],
+                [['text' => '❓ Помощь', 'callback_data' => '/help']],
             ];
 
             Log::info('Key command aborted: no active subscription', [
@@ -45,9 +45,7 @@ class KeyCommand extends BaseCommand
                 'text' => $message,
                 'parse_mode' => 'HTML',
                 'reply_markup' => json_encode([
-                    'keyboard' => $keyboard,
-                    'resize_keyboard' => true,
-                    'one_time_keyboard' => false,
+                    'inline_keyboard' => $keyboard,
                 ]),
             ];
 
@@ -146,7 +144,7 @@ class KeyCommand extends BaseCommand
 
             $keyboard = [
                 [['text' => '🔑 Получить ключ VPN', 'callback_data' => '/key']],
-                [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+                [['text' => '🏠 Главное меню', 'callback_data' => '/start']],
             ];
 
             if ($this->update->getCallbackQuery()) {
@@ -189,7 +187,7 @@ class KeyCommand extends BaseCommand
         $keyboard = [
             [['text' => '🔑 Получить новый ключ VPN', 'callback_data' => '/key']],
             [['text' => '📱 Инструкции по подключению', 'callback_data' => '/instructions']],
-            [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+            [['text' => '🏠 Главное меню', 'callback_data' => '/start']],
         ];
 
         if ($this->update->getCallbackQuery()) {
@@ -316,8 +314,8 @@ class KeyCommand extends BaseCommand
             '⚠️ Храните его в безопасном месте и не передавайте третьим лицам.';
 
         $keyboard = [
-            ['📱 Инструкции по подключению'],
-            ['⬅️ Назад'],
+            [['text' => '📱 Инструкции по подключению', 'callback_data' => '/instructions']],
+            [['text' => '⬅️ Назад', 'callback_data' => '/start']],
         ];
 
         $payload = [
@@ -326,9 +324,7 @@ class KeyCommand extends BaseCommand
             'text' => $message,
             'parse_mode' => 'HTML',
             'reply_markup' => json_encode([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
+                'inline_keyboard' => $keyboard,
             ]),
         ];
 

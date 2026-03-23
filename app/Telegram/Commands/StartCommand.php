@@ -3,6 +3,7 @@
 namespace App\Telegram\Commands;
 
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class StartCommand extends BaseCommand
@@ -18,23 +19,11 @@ class StartCommand extends BaseCommand
         $message = "👋 Добро пожаловать в VPN сервис!\n\n".
             'Выберите нужную опцию:';
 
-        $keyboard = [
-            ['🔑 Получить ключ', '📱 Инструкции по подключению'],
-            ['💳 Оплатить подписку', '📊 Статус подписки'],
-            // ['🎁 Ввести промокод', '📝 Поддержка'],
-            // ['❓ Помощь'],
-            ['📝 Поддержка', '❓ Помощь'],
-        ];
-
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
-            'reply_markup' => json_encode([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
-            ]),
+            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
         ]);
     }
 }

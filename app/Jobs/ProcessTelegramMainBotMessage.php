@@ -113,6 +113,10 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 $customer->pending_actions()->delete();
             }
 
+            if ($callbackQuery && $customer->pending_actions()->exists()) {
+                $customer->pending_actions()->delete();
+            }
+
             if ($callbackQuery) {
                 $this->answerCallbackQuery($callbackQuery->getId());
             }

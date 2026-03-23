@@ -39,7 +39,7 @@ class PayCommand extends BaseCommand
                 'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
 
             $keyboard = [
-                [['text' => '❓ Помощь', 'callback_data' => 'help']],
+                [['text' => '❓ Помощь', 'callback_data' => '/help']],
             ];
 
             Log::info('PayCommand test mode: skipped Telegram::sendMessage for active subscription notice', [

@@ -4,6 +4,7 @@ namespace App\Telegram\Services;
 
 use App\Models\Customer;
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramKeyboard;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
@@ -22,23 +23,11 @@ class PreCheckoutQueryService
                     "Дата окончания: {$subscription->date_end}\n\n".
                     'Если вы хотите продлить подписку, вы можете сделать это после окончания текущей.';
 
-                $keyboard = [
-                    ['🔑 Получить ключ', '📱 Инструкции по подключению'],
-                    ['💳 Оплатить подписку', '📊 Статус подписки'],
-                    // ['🎁 Ввести промокод', '📝 Поддержка'],
-                    // ['❓ Помощь'],
-                    ['📝 Поддержка', '❓ Помощь'],
-                ];
-
                 Telegram::sendMessage([
                     'chat_id' => $customer->telegram_id,
                     'text' => $message,
                     'parse_mode' => 'HTML',
-                    'reply_markup' => json_encode([
-                        'keyboard' => $keyboard,
-                        'resize_keyboard' => true,
-                        'one_time_keyboard' => false,
-                    ]),
+                    'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
                 ]);
 
                 Telegram::answerPreCheckoutQuery([

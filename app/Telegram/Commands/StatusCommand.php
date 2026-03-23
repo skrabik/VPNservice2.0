@@ -24,7 +24,7 @@ class StatusCommand extends BaseCommand
 
             $keyboard = [
                 [['text' => '💳 Оплатить подписку', 'callback_data' => '/pay']],
-                [['text' => '🏠 Главное меню', 'callback_data' => 'start']],
+                [['text' => '🏠 Главное меню', 'callback_data' => '/start']],
             ];
 
             Telegram::sendMessage([
@@ -83,7 +83,7 @@ class StatusCommand extends BaseCommand
             $keyboard[] = [['text' => '💳 Продлить подписку', 'callback_data' => '/pay']];
         }
 
-        $keyboard[] = [['text' => '🏠 Главное меню', 'callback_data' => 'start']];
+        $keyboard[] = [['text' => '🏠 Главное меню', 'callback_data' => '/start']];
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,

@@ -3,6 +3,7 @@
 namespace App\Telegram\Commands;
 
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
 class InstructionsCommand extends BaseCommand
@@ -20,20 +21,12 @@ class InstructionsCommand extends BaseCommand
 
     private function sendInstructions(): void
     {
-        $keyboard = [
-            ['⬅️ Назад'],
-        ];
-
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $this->getInstructions(),
             'parse_mode' => 'HTML',
             'disable_web_page_preview' => true,
-            'reply_markup' => json_encode([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
-            ]),
+            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::backToMainMenu('⬅️ Назад')),
         ]);
     }
 
