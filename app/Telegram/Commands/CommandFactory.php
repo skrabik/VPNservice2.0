@@ -21,6 +21,7 @@ class CommandFactory
         // '🎁 Ввести промокод' => PromoCommand::class,
         '/help' => HelpCommand::class,
         'help' => HelpCommand::class,
+        '🏠 Меню' => HelpCommand::class,
         '/support' => SupportCommand::class,
         '📝 Поддержка' => SupportCommand::class,
     ];

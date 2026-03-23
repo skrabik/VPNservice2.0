@@ -4,6 +4,7 @@ namespace App\Telegram\Commands;
 
 use App\Models\Customer;
 use App\Models\TelegramCommandLog;
+use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
 
@@ -25,28 +26,22 @@ class HelpCommand extends BaseCommand
         $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
                   "Доступные разделы:";
 
-        $keyboard = [
-            [
-                ['text' => '🔑 Получить ключ', 'callback_data' => '/key'],
-                ['text' => '📱 Инструкции', 'callback_data' => '/instructions'],
-            ],
-            [
-                ['text' => '📊 Статус', 'callback_data' => '/status'],
-                ['text' => '💳 Купить подписку', 'callback_data' => '/pay'],
-            ],
-            [
-                // ['text' => '🎁 Промокод', 'callback_data' => '/promo'],
-                ['text' => '📝 Поддержка', 'callback_data' => '/support'],
-            ],
-        ];
+        $this->sendBottomMenuKeyboard();
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
-            'reply_markup' => json_encode([
-                'inline_keyboard' => $keyboard,
-            ]),
+            'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::mainMenu()),
+        ]);
+    }
+
+    private function sendBottomMenuKeyboard(): void
+    {
+        Telegram::sendMessage([
+            'chat_id' => $this->customer->telegram_id,
+            'text' => 'Если нижняя кнопка пропала, она восстановлена.',
+            'reply_markup' => TelegramKeyboard::reply(TelegramKeyboard::bottomMenuButton(), true),
         ]);
     }
 }

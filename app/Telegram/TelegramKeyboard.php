@@ -11,6 +11,16 @@ class TelegramKeyboard
         ], JSON_UNESCAPED_UNICODE);
     }
 
+    public static function reply(array $keyboard, bool $isPersistent = false): string
+    {
+        return json_encode([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false,
+            'is_persistent' => $isPersistent,
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
     public static function mainMenu(): array
     {
         return [
@@ -41,5 +51,12 @@ class TelegramKeyboard
         return [[
             ['text' => '❌ Отмена', 'callback_data' => '/start'],
         ]];
+    }
+
+    public static function bottomMenuButton(): array
+    {
+        return [
+            ['🏠 Меню'],
+        ];
     }
 }
