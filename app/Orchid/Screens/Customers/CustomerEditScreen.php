@@ -117,9 +117,9 @@ class CustomerEditScreen extends Screen
     /**
      * @return array<string, mixed>
      */
-    public function loadSubscriptionOnOpenModal(Customer $customer, Subscription $subscription): iterable
+    public function loadSubscriptionOnOpenModal(Subscription $subscription): iterable
     {
-        if ($subscription->customer_id !== $customer->id) {
+        if ($this->customer->exists && $subscription->customer_id !== $this->customer->id) {
             abort(404);
         }
 
