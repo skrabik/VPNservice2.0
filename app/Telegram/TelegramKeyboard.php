@@ -43,10 +43,10 @@ class TelegramKeyboard
     {
         return [
             [
-                ['text' => '⭐ Telegram Stars', 'callback_data' => '/pay?method=stars'],
+                ['text' => '💳 ЮKassa', 'callback_data' => '/pay?method=yookassa'],
             ],
             [
-                ['text' => '💳 ЮKassa', 'callback_data' => '/pay?method=yookassa'],
+                ['text' => '⭐ Telegram Stars', 'callback_data' => '/pay?method=stars'],
             ],
             self::backToMainMenu('⬅️ Назад')[0],
         ];

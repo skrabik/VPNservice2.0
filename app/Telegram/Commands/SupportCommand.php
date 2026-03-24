@@ -22,7 +22,7 @@ class SupportCommand extends BaseCommand
         ]);
 
         $message = "📝 <b>Создание тикета поддержки</b>\n\n".
-                  'Пожалуйста, введите ваше сообщение:';
+                  'Пожалуйста, опишите вашу проблему:';
 
         Telegram::sendMessage([
             'chat_id' => $this->customer->telegram_id,

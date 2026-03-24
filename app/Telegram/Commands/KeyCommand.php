@@ -105,7 +105,7 @@ class KeyCommand extends BaseCommand
 
         $keyboard[] = [['text' => '⬅️ Назад', 'callback_data' => '/start']];
 
-        $message = '🔑 Выберите сервер для создания ключа VPN:';
+        $message = '🔑 Выберите сервер для создания нового ключа VPN:';
 
         // Удаляем предыдущее сообщение если это callback
         if ($this->update->getCallbackQuery()) {

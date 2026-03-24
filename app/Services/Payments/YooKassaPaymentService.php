@@ -11,7 +11,7 @@ use RuntimeException;
 
 class YooKassaPaymentService
 {
-    public function createHostedPayment(Customer $customer, Plan $plan): array
+    public function createHostedPayment(Customer $customer, Plan $plan, ?string $returnUrl = null): array
     {
         $amount = number_format((float) $plan->price, 2, '.', '');
 
@@ -31,7 +31,7 @@ class YooKassaPaymentService
                 'capture' => true,
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => (string) config('yookassa.return_url'),
+                    'return_url' => $returnUrl ?: (string) config('yookassa.return_url'),
                 ],
                 'description' => sprintf('Подписка "%s" на %d дней', $plan->title, $plan->period),
                 'metadata' => [

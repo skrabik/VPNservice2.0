@@ -29,6 +29,7 @@ Route::prefix('account')->name('customer.')->group(function () {
         Route::get('status', [CabinetController::class, 'status'])->name('status');
         Route::get('instructions', [CabinetController::class, 'instructions'])->name('instructions');
         Route::get('pay', [CabinetController::class, 'pay'])->name('pay');
+        Route::post('pay/yookassa', [CabinetController::class, 'createYooKassaPayment'])->name('pay.yookassa');
 
         Route::get('keys', [KeyController::class, 'index'])->name('keys');
         Route::post('keys', [KeyController::class, 'store'])->name('keys.store');

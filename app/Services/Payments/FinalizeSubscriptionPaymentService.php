@@ -76,6 +76,10 @@ class FinalizeSubscriptionPaymentService
 
     public static function sendSuccessMessage(Customer $customer, Plan $plan, ?string $dateEnd, bool $wasExtended = false): void
     {
+        if (! $customer->telegram_id) {
+            return;
+        }
+
         $message = $wasExtended
             ? "🎉 <b>Подписка успешно продлена!</b>\n\n".
                 "✅ Подписка на план <b>{$plan->title}</b> теперь активна до {$dateEnd}\n\n".
@@ -85,14 +89,22 @@ class FinalizeSubscriptionPaymentService
                 "🔑 Теперь вы можете получить ключ VPN, используя команду:\n".
                 "/key\n\n".
                 'После получения ключа следуйте инструкциям по подключению к VPN серверу.';
-        Telegram::sendMessage([
-            'chat_id' => $customer->telegram_id,
-            'text' => $message,
-            'parse_mode' => 'HTML',
-            'reply_markup' => TelegramKeyboard::inline([
-                [['text' => '🔑 Получить ключ', 'callback_data' => '/key']],
-                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
-            ]),
-        ]);
+
+        try {
+            Telegram::sendMessage([
+                'chat_id' => $customer->telegram_id,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+                'reply_markup' => TelegramKeyboard::inline([
+                    [['text' => '🔑 Получить ключ', 'callback_data' => '/key']],
+                    [['text' => '⬅️ Назад', 'callback_data' => '/start']],
+                ]),
+            ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to send Telegram success payment message', [
+                'customer_id' => $customer->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }
