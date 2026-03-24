@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Orchid\Screens\Customers;
 
 use App\Models\Customer;
-use App\Orchid\Layouts\Customer\CustomerEditLayout;
-use App\Orchid\Layouts\Customer\CustomerVpnKeysLayout;
-use App\Orchid\Layouts\Customer\CustomerSubscriptionsLayout;
 use App\Models\Subscription;
+use App\Orchid\Layouts\Customer\CustomerEditLayout;
+use App\Orchid\Layouts\Customer\CustomerSubscriptionEditModalLayout;
+use App\Orchid\Layouts\Customer\CustomerSubscriptionsLayout;
+use App\Orchid\Layouts\Customer\CustomerVpnKeysLayout;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\Button;
 use Orchid\Screen\Screen;
@@ -106,7 +107,44 @@ class CustomerEditScreen extends Screen
                 ->title(__('VPN Keys'))
                 ->description(__('List of customer VPN keys, including soft-deleted ones.'))
                 ->canSee($this->customer->exists),
+
+            Layout::modal('editSubscriptionModal', CustomerSubscriptionEditModalLayout::class)
+                ->deferred('loadSubscriptionOnOpenModal')
+                ->canSee($this->customer->exists),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function loadSubscriptionOnOpenModal(Customer $customer, Subscription $subscription): iterable
+    {
+        if ($subscription->customer_id !== $customer->id) {
+            abort(404);
+        }
+
+        return [
+            'subscription' => $subscription,
+        ];
+    }
+
+    public function saveSubscription(Customer $customer, Request $request, Subscription $subscription): void
+    {
+        if ($subscription->customer_id !== $customer->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'subscription.date_start' => ['required', 'date'],
+            'subscription.date_end' => ['required', 'date', 'after_or_equal:subscription.date_start'],
+        ]);
+
+        $subscription->fill([
+            'date_start' => $validated['subscription']['date_start'],
+            'date_end' => $validated['subscription']['date_end'],
+        ])->save();
+
+        Toast::info(__('Subscription was updated.'));
     }
 
     /**
@@ -144,8 +182,9 @@ class CustomerEditScreen extends Screen
             ->where('customer_id', $customer->id)
             ->first();
 
-        if (!$subscription) {
+        if (! $subscription) {
             Toast::warning(__('Subscription not found.'));
+
             return;
         }
 
