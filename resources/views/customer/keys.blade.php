@@ -1,4 +1,6 @@
-@php($title = 'VPN-ключи')
+@php
+    $title = 'VPN-ключи';
+@endphp
 @extends('customer.layouts.app')
 
 @section('content')

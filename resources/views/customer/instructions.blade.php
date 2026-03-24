@@ -1,4 +1,6 @@
-@php($title = 'Инструкции')
+@php
+    $title = 'Инструкции';
+@endphp
 @extends('customer.layouts.app')
 
 @section('content')

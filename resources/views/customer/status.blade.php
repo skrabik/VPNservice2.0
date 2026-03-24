@@ -1,4 +1,6 @@
-@php($title = 'Статус подписки')
+@php
+    $title = 'Статус подписки';
+@endphp
 @extends('customer.layouts.app')
 
 @section('content')
