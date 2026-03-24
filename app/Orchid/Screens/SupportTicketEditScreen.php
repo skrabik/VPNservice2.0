@@ -19,7 +19,8 @@ use Orchid\Support\Facades\Toast;
 
 class SupportTicketEditScreen extends Screen
 {
-    public SupportTicket $supportTicket;
+    /** @var SupportTicket */
+    public $supportTicket;
 
     public function query(SupportTicket $supportTicket): iterable
     {
