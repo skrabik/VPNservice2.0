@@ -137,9 +137,6 @@ class PayCommand extends BaseCommand
                     [
                         ['text' => 'Перейти к оплате', 'url' => $confirmationUrl],
                     ],
-                    [
-                        ['text' => '⭐ Оплатить Stars', 'callback_data' => '/pay?method=stars'],
-                    ],
                     TelegramKeyboard::backToMainMenu('🏠 Главное меню')[0],
                 ]),
             ]);

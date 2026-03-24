@@ -5,6 +5,7 @@ namespace App\Services\Payments;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Telegram\TelegramKeyboard;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Laravel\Facades\Telegram;
 
@@ -78,18 +79,20 @@ class FinalizeSubscriptionPaymentService
         $message = $wasExtended
             ? "🎉 <b>Подписка успешно продлена!</b>\n\n".
                 "✅ Подписка на план <b>{$plan->title}</b> теперь активна до {$dateEnd}\n\n".
-                "🔑 При необходимости вы можете перевыпустить VPN-ключ командой:\n".
-                '/key'
+                "🔑 При необходимости вы можете перевыпустить VPN-ключ:\n"
             : "🎉 <b>Подписка успешно активирована!</b>\n\n".
                 "✅ Ваша подписка на план <b>{$plan->title}</b> активна до {$dateEnd}\n\n".
                 "🔑 Теперь вы можете получить ключ VPN, используя команду:\n".
                 "/key\n\n".
                 'После получения ключа следуйте инструкциям по подключению к VPN серверу.';
-
         Telegram::sendMessage([
             'chat_id' => $customer->telegram_id,
             'text' => $message,
             'parse_mode' => 'HTML',
+            'reply_markup' => TelegramKeyboard::inline([
+                [['text' => '🔑 Получить ключ', 'callback_data' => '/key']],
+                [['text' => '⬅️ Назад', 'callback_data' => '/start']],
+            ]),
         ]);
     }
 }
