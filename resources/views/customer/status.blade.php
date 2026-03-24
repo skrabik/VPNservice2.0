@@ -11,18 +11,14 @@
             </div>
         @endif
 
-        <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <div class="rounded-2xl bg-slate-800 p-5">
                 <p class="text-sm text-slate-400">Статус</p>
                 <p class="mt-2 text-xl font-semibold">{{ $overview['status_icon'] }} {{ $overview['status_text'] }}</p>
             </div>
             <div class="rounded-2xl bg-slate-800 p-5">
-                <p class="text-sm text-slate-400">Дней осталось</p>
-                <p class="mt-2 text-xl font-semibold">{{ $overview['days_left'] }}</p>
-            </div>
-            <div class="rounded-2xl bg-slate-800 p-5">
-                <p class="text-sm text-slate-400">Часов осталось</p>
-                <p class="mt-2 text-xl font-semibold">{{ $overview['hours_left'] }}</p>
+                <p class="text-sm text-slate-400">Осталось</p>
+                <p class="mt-2 text-xl font-semibold">{{ $overview['days_left'] }} дн. {{ $overview['hours_left'] }} ч.</p>
             </div>
             <div class="rounded-2xl bg-slate-800 p-5">
                 <p class="text-sm text-slate-400">Активные ключи</p>
