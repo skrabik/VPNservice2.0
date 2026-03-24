@@ -10,26 +10,26 @@
     </head>
     <body class="min-h-screen bg-slate-950 text-slate-100">
         <header class="border-b border-slate-800 bg-slate-900/95">
-            <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                <div>
+            <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+                <div class="min-w-0">
                     <a href="{{ route('customer.dashboard') }}" class="text-lg font-semibold text-white">Quantum Shield</a>
                     <p class="text-sm text-slate-400">Пользовательский веб-кабинет</p>
                 </div>
-                <div class="text-right">
+                <div class="min-w-0 sm:text-right">
                     <p class="font-medium text-white">{{ auth('customer')->user()->first_name }}</p>
-                    <p class="text-sm text-slate-400">{{ auth('customer')->user()->email ?: 'Telegram-only аккаунт' }}</p>
+                    <p class="truncate text-sm text-slate-400">{{ auth('customer')->user()->email ?: 'Telegram-only аккаунт' }}</p>
                 </div>
             </div>
-            <nav class="mx-auto flex max-w-6xl flex-wrap gap-2 px-4 pb-4">
-                <a href="{{ route('customer.dashboard') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.dashboard') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">Главная</a>
-                <a href="{{ route('customer.status') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.status') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">Подписка</a>
-                <a href="{{ route('customer.keys') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.keys') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">VPN-ключи</a>
-                <a href="{{ route('customer.instructions') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.instructions') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">Инструкции</a>
-                <a href="{{ route('customer.support') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.support') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">Поддержка</a>
-                <a href="{{ route('customer.pay') }}" class="rounded-full px-4 py-2 text-sm {{ request()->routeIs('customer.pay') ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-200' }}">Оплата</a>
-                <form method="POST" action="{{ route('customer.logout') }}" class="ml-auto">
+            <nav class="mx-auto grid max-w-6xl grid-cols-2 gap-2 px-4 pb-4 sm:grid-cols-3 lg:flex lg:flex-wrap">
+                <a href="{{ route('customer.dashboard') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.dashboard') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">Главная</a>
+                <a href="{{ route('customer.status') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.status') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">Подписка</a>
+                <a href="{{ route('customer.keys') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.keys') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">VPN-ключи</a>
+                <a href="{{ route('customer.instructions') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.instructions') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">Инструкции</a>
+                <a href="{{ route('customer.support') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.support') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">Поддержка</a>
+                <a href="{{ route('customer.pay') }}" class="flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm transition {{ request()->routeIs('customer.pay') ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-slate-800 text-slate-200 hover:bg-slate-700' }}">Оплата</a>
+                <form method="POST" action="{{ route('customer.logout') }}" class="col-span-2 sm:col-span-3 lg:ml-auto">
                     @csrf
-                    <button type="submit" class="rounded-full bg-slate-800 px-4 py-2 text-sm text-slate-200">Выйти</button>
+                    <button type="submit" class="flex min-h-11 w-full items-center justify-center rounded-2xl bg-slate-800 px-4 py-2.5 text-center text-sm text-slate-200 transition hover:bg-slate-700 lg:w-auto">Выйти</button>
                 </form>
             </nav>
         </header>
