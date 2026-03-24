@@ -3,6 +3,7 @@
 namespace App\Telegram\Services;
 
 use App\Models\Customer;
+use App\Models\SupportTicket;
 use App\Services\CustomerSupportService;
 use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
@@ -14,11 +15,11 @@ class SupportTicketService
     {
         $message = $update->getMessage()->getText();
 
-        (new CustomerSupportService)->createTicket($customer, $message);
+        $ticket = (new CustomerSupportService)->createTicket($customer, $message, SupportTicket::CHANNEL_TELEGRAM);
 
         Telegram::sendMessage([
             'chat_id' => $customer->telegram_id,
-            'text' => 'Ваш тикет создан. Мы скоро свяжемся с вами.',
+            'text' => "Ваш тикет создан. Номер обращения: #{$ticket->id}\n\nМы скоро свяжемся с вами.",
             'reply_markup' => TelegramKeyboard::inline(TelegramKeyboard::backToMainMenu('⬅️ Назад')),
         ]);
     }

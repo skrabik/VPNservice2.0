@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\SupportTicket;
 use App\Services\CustomerSupportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class SupportController extends Controller
 
         return view('customer.support', [
             'tickets' => $customer->supportTickets()
+                ->with(['replies.user'])
                 ->latest('id')
                 ->get(),
         ]);
@@ -31,10 +33,14 @@ class SupportController extends Controller
             'message' => ['required', 'string', 'min:10', 'max:5000'],
         ]);
 
-        $this->supportService->createTicket($request->user('customer'), $validated['message']);
+        $ticket = $this->supportService->createTicket(
+            $request->user('customer'),
+            $validated['message'],
+            SupportTicket::CHANNEL_WEB,
+        );
 
         return redirect()
             ->route('customer.support')
-            ->with('status', 'Ваше обращение отправлено. Мы скоро ответим.');
+            ->with('status', "Ваше обращение отправлено. Номер тикета #{$ticket->id}.");
     }
 }

@@ -11,6 +11,7 @@ use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\Server\ServerEditScreen;
 use App\Orchid\Screens\Server\ServerListScreen;
+use App\Orchid\Screens\SupportTicketEditScreen;
 use App\Orchid\Screens\SupportTicketScreen;
 use App\Orchid\Screens\TelegramCommandLogScreen;
 use App\Orchid\Screens\User\UserEditScreen;
@@ -150,3 +151,9 @@ Route::screen('support-tickets', SupportTicketScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Support Tickets'), route('platform.support-tickets')));
+
+Route::screen('support-tickets/{supportTicket}', SupportTicketEditScreen::class)
+    ->name('platform.support-tickets.view')
+    ->breadcrumbs(fn (Trail $trail, $supportTicket) => $trail
+        ->parent('platform.support-tickets')
+        ->push("#{$supportTicket->id}", route('platform.support-tickets.view', $supportTicket)));
