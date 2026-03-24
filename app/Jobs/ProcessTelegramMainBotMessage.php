@@ -14,6 +14,7 @@ use App\Telegram\TelegramManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Database\QueryException;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -55,26 +56,23 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 return;
             }
 
-            $customer = Customer::where('telegram_id', $telegram_id)->first();
-
-            if (! $customer) {
-                $from = $callbackQuery?->getFrom() ?? $preCheckoutQuery?->getFrom() ?? $message?->getFrom();
-                if (! $from) {
-                    Log::warning('No from payload found in update', [
-                        'telegram_id' => $telegram_id,
-                    ]);
-
-                    return;
-                }
-
-                $customer = Customer::create([
+            $from = $callbackQuery?->getFrom() ?? $preCheckoutQuery?->getFrom() ?? $message?->getFrom();
+            if (! $from) {
+                Log::warning('No from payload found in update', [
                     'telegram_id' => $telegram_id,
-                    'telegram_username' => $from->getUsername(),
-                    'first_name' => $from->getFirstName(),
-                    'last_name' => $from->getLastName(),
                 ]);
-                Log::info('Created new customer', ['customer_id' => $customer->id]);
 
+                return;
+            }
+
+            [$customer, $requiresOnboarding] = $this->resolveCustomer(
+                (string) $telegram_id,
+                $from->getUsername(),
+                $from->getFirstName(),
+                $from->getLastName(),
+            );
+
+            if ($requiresOnboarding) {
                 $this->createWelcomeSubscription($customer);
 
                 $this->createWelcomeVpnKey($customer);
@@ -143,6 +141,74 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 'customer_id' => $customer->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    private function resolveCustomer(
+        string $telegramId,
+        ?string $telegramUsername,
+        ?string $firstName,
+        ?string $lastName,
+    ): array {
+        $customer = Customer::withTrashed()
+            ->where('telegram_id', $telegramId)
+            ->first();
+
+        if ($customer) {
+            $requiresOnboarding = $customer->trashed();
+
+            $customer->forceFill([
+                'telegram_username' => $telegramUsername,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ]);
+
+            if ($requiresOnboarding) {
+                $customer->restore();
+                Log::info('Restored customer by telegram_id', ['customer_id' => $customer->id]);
+            }
+
+            $customer->save();
+
+            return [$customer, $requiresOnboarding];
+        }
+
+        try {
+            $customer = Customer::create([
+                'telegram_id' => $telegramId,
+                'telegram_username' => $telegramUsername,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ]);
+
+            Log::info('Created new customer', ['customer_id' => $customer->id]);
+
+            return [$customer, true];
+        } catch (QueryException $exception) {
+            if ($exception->getCode() !== '23505') {
+                throw $exception;
+            }
+
+            $customer = Customer::withTrashed()
+                ->where('telegram_id', $telegramId)
+                ->firstOrFail();
+
+            $requiresOnboarding = $customer->trashed();
+
+            $customer->forceFill([
+                'telegram_username' => $telegramUsername,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ]);
+
+            if ($requiresOnboarding) {
+                $customer->restore();
+                Log::info('Restored customer after unique conflict', ['customer_id' => $customer->id]);
+            }
+
+            $customer->save();
+
+            return [$customer, $requiresOnboarding];
         }
     }
 

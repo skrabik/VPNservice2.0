@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Customer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 
 class CustomerTelegramAuthService
@@ -21,32 +22,76 @@ class CustomerTelegramAuthService
         $telegramUser = $payload['user'];
 
         return DB::transaction(function () use ($telegramUser) {
-            $customer = Customer::query()
-                ->where('telegram_id', (string) $telegramUser['id'])
-                ->first();
+            [$customer, $requiresOnboarding] = $this->resolveCustomer($telegramUser);
 
-            if ($customer) {
-                $customer->forceFill([
-                    'telegram_username' => $telegramUser['username'] ?? $customer->telegram_username,
-                    'first_name' => $telegramUser['first_name'] ?? $customer->first_name,
-                    'last_name' => $telegramUser['last_name'] ?? $customer->last_name,
-                ])->save();
-
-                return $customer;
+            if ($requiresOnboarding) {
+                $this->onboardingService->createWelcomeSubscription($customer);
+                $this->onboardingService->createWelcomeVpnKey($customer);
             }
-
-            $customer = Customer::query()->create([
-                'telegram_id' => (string) $telegramUser['id'],
-                'telegram_username' => $telegramUser['username'] ?? null,
-                'first_name' => $telegramUser['first_name'] ?? 'Telegram',
-                'last_name' => $telegramUser['last_name'] ?? null,
-            ]);
-
-            $this->onboardingService->createWelcomeSubscription($customer);
-            $this->onboardingService->createWelcomeVpnKey($customer);
 
             return $customer;
         });
+    }
+
+    /**
+     * @param  array<string, mixed>  $telegramUser
+     * @return array{0: Customer, 1: bool}
+     */
+    private function resolveCustomer(array $telegramUser): array
+    {
+        $telegramId = (string) $telegramUser['id'];
+        $attributes = [
+            'telegram_username' => $telegramUser['username'] ?? null,
+            'first_name' => $telegramUser['first_name'] ?? 'Telegram',
+            'last_name' => $telegramUser['last_name'] ?? null,
+        ];
+
+        $customer = Customer::withTrashed()
+            ->where('telegram_id', $telegramId)
+            ->first();
+
+        if ($customer) {
+            $requiresOnboarding = $customer->trashed();
+
+            $customer->forceFill($attributes);
+
+            if ($requiresOnboarding) {
+                $customer->restore();
+            }
+
+            $customer->save();
+
+            return [$customer, $requiresOnboarding];
+        }
+
+        try {
+            $customer = Customer::query()->create([
+                'telegram_id' => $telegramId,
+                ...$attributes,
+            ]);
+
+            return [$customer, true];
+        } catch (QueryException $exception) {
+            if ($exception->getCode() !== '23505') {
+                throw $exception;
+            }
+
+            $customer = Customer::withTrashed()
+                ->where('telegram_id', $telegramId)
+                ->firstOrFail();
+
+            $requiresOnboarding = $customer->trashed();
+
+            $customer->forceFill($attributes);
+
+            if ($requiresOnboarding) {
+                $customer->restore();
+            }
+
+            $customer->save();
+
+            return [$customer, $requiresOnboarding];
+        }
     }
 
     /**
