@@ -28,7 +28,7 @@ class CustomerInstructionService
                 'type' => self::TYPE_ANDROID,
                 'label' => 'Android',
                 'icon' => '🤖',
-                'download_url' => 'https:/ёps/details?id=com.v2raytun.android',
+                'download_url' => 'https://play.google.com/store/apps/details?id=com.v2raytun.android',
             ],
             [
                 'type' => self::TYPE_IPHONE,
