@@ -67,6 +67,11 @@ class PlatformProvider extends OrchidServiceProvider
                 ->route('platform.command-logs')
                 ->permission('platform.command-logs'),
 
+            Menu::make(__('Telegram Broadcasts'))
+                ->icon('bs.megaphone')
+                ->route('platform.telegram-broadcasts')
+                ->permission('platform.telegram-broadcasts'),
+
             Menu::make(__('Support Tickets'))
                 ->icon('bs.ticket')
                 ->route('platform.support-tickets')
@@ -92,6 +97,7 @@ class PlatformProvider extends OrchidServiceProvider
                 ->addPermission('platform.customers', __('Customers'))
                 ->addPermission('platform.plans', __('Plans'))
                 ->addPermission('platform.command-logs', __('Telegram Logs'))
+                ->addPermission('platform.telegram-broadcasts', __('Telegram Broadcasts'))
                 ->addPermission('platform.support-tickets', __('Support Tickets')),
         ];
     }

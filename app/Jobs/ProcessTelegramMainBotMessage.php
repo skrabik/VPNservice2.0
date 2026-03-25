@@ -94,9 +94,10 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
             if ($message && $customer->pending_actions()->exists()) {
                 $pendingAction = $customer->pending_actions()->first();
+                $messageText = trim((string) $message->getText());
 
                 if ($pendingAction->action_id === CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE &&
-                    $message->getText() != '❌ Отмена'
+                    ! $this->isSupportTicketCancellation($messageText)
                 ) {
                     SupportTicketService::process($update, $customer);
                     $customer->pending_actions()->delete();
@@ -105,6 +106,12 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 }
 
                 $customer->pending_actions()->delete();
+
+                if ($pendingAction->action_id === CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE &&
+                    $this->isSupportTicketCancellation($messageText)
+                ) {
+                    return;
+                }
             }
 
             if ($callbackQuery && $customer->pending_actions()->exists()) {
@@ -224,6 +231,13 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    private function isSupportTicketCancellation(string $messageText): bool
+    {
+        $normalizedText = preg_replace('/^❌\s*/u', '', trim($messageText));
+
+        return in_array($normalizedText, ['Отмена', 'отмена'], true);
     }
 
     private function createWelcomeVpnKey(Customer $customer): void

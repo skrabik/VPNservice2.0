@@ -20,6 +20,7 @@ class CustomerSubscriptionEditModalLayout extends Rows
                 ->title(__('Start date'))
                 ->enableTime()
                 ->format24hr()
+                ->minuteIncrement(1)
                 ->required()
                 ->static(),
 
@@ -27,6 +28,7 @@ class CustomerSubscriptionEditModalLayout extends Rows
                 ->title(__('End date'))
                 ->enableTime()
                 ->format24hr()
+                ->minuteIncrement(1)
                 ->required()
                 ->static(),
         ];

@@ -14,6 +14,8 @@ use App\Orchid\Screens\Server\ServerListScreen;
 use App\Orchid\Screens\SupportTicketEditScreen;
 use App\Orchid\Screens\SupportTicketScreen;
 use App\Orchid\Screens\TelegramCommandLogScreen;
+use App\Orchid\Screens\TelegramBroadcasts\TelegramBroadcastEditScreen;
+use App\Orchid\Screens\TelegramBroadcasts\TelegramBroadcastListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
@@ -145,6 +147,26 @@ Route::screen('command-logs', TelegramCommandLogScreen::class)
     ->breadcrumbs(fn (Trail $trail) => $trail
         ->parent('platform.index')
         ->push(__('Telegram Logs'), route('platform.command-logs')));
+
+Route::prefix('telegram-broadcasts')->group(function () {
+    Route::screen('/', TelegramBroadcastListScreen::class)
+        ->name('platform.telegram-broadcasts')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.index')
+            ->push(__('Telegram Broadcasts'), route('platform.telegram-broadcasts')));
+
+    Route::screen('create', TelegramBroadcastEditScreen::class)
+        ->name('platform.telegram-broadcasts.create')
+        ->breadcrumbs(fn (Trail $trail) => $trail
+            ->parent('platform.telegram-broadcasts')
+            ->push(__('Create'), route('platform.telegram-broadcasts.create')));
+
+    Route::screen('{broadcast}/edit', TelegramBroadcastEditScreen::class)
+        ->name('platform.telegram-broadcasts.edit')
+        ->breadcrumbs(fn (Trail $trail, $broadcast) => $trail
+            ->parent('platform.telegram-broadcasts')
+            ->push("#{$broadcast->id}", route('platform.telegram-broadcasts.edit', $broadcast)));
+});
 
 Route::screen('support-tickets', SupportTicketScreen::class)
     ->name('platform.support-tickets')
