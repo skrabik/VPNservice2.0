@@ -103,6 +103,7 @@ class CustomerEditScreen extends Screen
                 ->title(__('Subscriptions'))
                 ->description(__('List of customer subscriptions.'))
                 ->canSee($this->customer->exists),
+                
             Layout::block(CustomerVpnKeysLayout::class)
                 ->title(__('VPN Keys'))
                 ->description(__('List of customer VPN keys, including soft-deleted ones.'))
