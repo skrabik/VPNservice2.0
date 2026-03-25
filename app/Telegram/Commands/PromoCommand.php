@@ -12,7 +12,7 @@ use Telegram\Bot\Objects\Update;
 
 class PromoCommand extends BaseCommand
 {
-    private const PROMO_PERIOD_DAYS = 15;
+    private const PROMO_PERIOD_DAYS = 10;
 
     public function __construct(Update $update, Customer $customer, array $params)
     {
@@ -32,7 +32,7 @@ class PromoCommand extends BaseCommand
         if ($message === '/promo' || $message === '🎁 Ввести промокод') {
 
             $text = "🎁 <b>Введите промокод</b>\n\n".
-                "Если у вас есть промокод, введите его ниже для получения бесплатного VPN на 15 дней.\n\n".
+                "Если у вас есть промокод, введите его ниже для получения бесплатного VPN на 10 дней.\n\n".
                 '💡 Промокоды можно использовать многократно.';
 
             $keyboard = [
@@ -85,7 +85,7 @@ class PromoCommand extends BaseCommand
             ['slug' => 'promo'],
             [
                 'title' => 'Промо план',
-                'description' => 'Бесплатный план на 15 дней для новых пользователей',
+                'description' => 'Бесплатный план на 10 дней для новых пользователей',
                 'price' => 0,
                 'stars' => 1,
                 'period' => self::PROMO_PERIOD_DAYS,

@@ -271,7 +271,7 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
     {
         try {
             $message = "🎉 <b>Добро пожаловать!</b>\n\n".
-                "✅ Вам автоматически предоставлен бесплатный VPN на <b>15 дней</b>\n".
+                "✅ Вам автоматически предоставлен бесплатный VPN на <b>10 дней</b>\n".
                 "🔑 Ваш ключ VPN:\n\n".
                 "<code>{$access_url}</code>\n\n".
                 'Качайте приложение для подключения к VPN:';

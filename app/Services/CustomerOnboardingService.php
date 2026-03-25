@@ -11,7 +11,7 @@ use App\Services\VpnProviders\VpnAccessManager;
 
 class CustomerOnboardingService
 {
-    private const PROMO_PERIOD_DAYS = 15;
+    private const PROMO_PERIOD_DAYS = 10;
 
     public function __construct(
         private readonly VpnAccessManager $vpnAccessManager = new VpnAccessManager,
@@ -25,7 +25,7 @@ class CustomerOnboardingService
             ['slug' => 'promo'],
             [
                 'title' => 'Промо план',
-                'description' => 'Бесплатный план на 15 дней для новых пользователей',
+                'description' => 'Бесплатный план на 10 дней для новых пользователей',
                 'price' => 0,
                 'stars' => 1,
                 'period' => self::PROMO_PERIOD_DAYS,
