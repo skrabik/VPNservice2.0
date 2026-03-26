@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerPendingAction;
 use App\Services\CustomerCabinetLinkService;
 use App\Services\CustomerOnboardingService;
+use App\Telegram\Commands\StartCommand;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
 use App\Telegram\Services\SuccessfulPaymentService;
@@ -110,6 +111,8 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 if ($pendingAction->action_id === CustomerPendingAction::ACTION_SUPPORT_TICKET_TYPE &&
                     $this->isSupportTicketCancellation($messageText)
                 ) {
+                    $this->returnCustomerToStartMenu($update, $customer);
+
                     return;
                 }
             }
@@ -235,9 +238,14 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
 
     private function isSupportTicketCancellation(string $messageText): bool
     {
-        $normalizedText = preg_replace('/^❌\s*/u', '', trim($messageText));
+        $normalizedText = trim((string) preg_replace('/^❌\s*/u', '', trim($messageText)));
 
-        return in_array($normalizedText, ['Отмена', 'отмена'], true);
+        return mb_strtolower($normalizedText) === 'отмена';
+    }
+
+    private function returnCustomerToStartMenu(Update $update, Customer $customer): void
+    {
+        (new StartCommand($update, $customer, []))->handle();
     }
 
     private function createWelcomeVpnKey(Customer $customer): void
