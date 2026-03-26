@@ -42,6 +42,7 @@ class CabinetController extends Controller
     {
         return view('customer.status', [
             'overview' => $this->statusService->getOverview($request->user('customer')),
+            'botUrl' => $this->cabinetLinkService->getBotUrl(),
         ]);
     }
 
