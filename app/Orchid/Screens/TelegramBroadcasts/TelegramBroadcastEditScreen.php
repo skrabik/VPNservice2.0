@@ -18,7 +18,8 @@ use Orchid\Support\Facades\Toast;
 
 class TelegramBroadcastEditScreen extends Screen
 {
-    public TelegramBroadcast $broadcast;
+    /** @var TelegramBroadcast */
+    public $broadcast;
 
     public function query(TelegramBroadcast $broadcast): iterable
     {
