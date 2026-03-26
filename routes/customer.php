@@ -3,9 +3,11 @@
 use App\Http\Controllers\Customer\CabinetController;
 use App\Http\Controllers\Customer\KeyController;
 use App\Http\Controllers\Customer\SupportController;
+use App\Http\Controllers\Customer\TelegramConnectionController;
 use App\Http\Controllers\CustomerAuth\AuthenticatedSessionController;
 use App\Http\Controllers\CustomerAuth\ClaimRegistrationController;
 use App\Http\Controllers\CustomerAuth\RegisteredUserController;
+use App\Http\Controllers\CustomerAuth\TelegramBrowserLoginController;
 use App\Http\Controllers\CustomerAuth\TelegramAuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,7 @@ Route::prefix('account')->name('customer.')->group(function () {
         Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
         Route::post('telegram-login', [TelegramAuthenticatedSessionController::class, 'store'])->name('telegram.store');
+        Route::get('login/telegram-link/{token}', [TelegramBrowserLoginController::class, 'store'])->name('telegram.browser-login');
 
         Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
         Route::post('register', [RegisteredUserController::class, 'store'])->name('register.store');
@@ -30,6 +33,7 @@ Route::prefix('account')->name('customer.')->group(function () {
         Route::get('instructions', [CabinetController::class, 'instructions'])->name('instructions');
         Route::get('pay', [CabinetController::class, 'pay'])->name('pay');
         Route::post('pay/yookassa', [CabinetController::class, 'createYooKassaPayment'])->name('pay.yookassa');
+        Route::post('telegram/connect', [TelegramConnectionController::class, 'store'])->name('telegram.connect');
 
         Route::get('keys', [KeyController::class, 'index'])->name('keys');
         Route::post('keys', [KeyController::class, 'store'])->name('keys.store');

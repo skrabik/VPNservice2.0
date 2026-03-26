@@ -4,8 +4,10 @@ namespace App\Jobs;
 
 use App\Models\Customer;
 use App\Models\CustomerPendingAction;
+use App\Services\CustomerAuthLinkService;
 use App\Services\CustomerCabinetLinkService;
 use App\Services\CustomerOnboardingService;
+use App\Services\TelegramMessageService;
 use App\Telegram\Commands\StartCommand;
 use App\Telegram\Services\CommandService;
 use App\Telegram\Services\PreCheckoutQueryService;
@@ -62,6 +64,22 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
                 Log::warning('No from payload found in update', [
                     'telegram_id' => $telegram_id,
                 ]);
+
+                return;
+            }
+
+            $customer = null;
+            $requiresOnboarding = false;
+            $startPayload = $message ? TelegramManager::extractStartPayload($update) : null;
+
+            if ($startPayload && str_starts_with($startPayload, 'link_')) {
+                $this->resolveLinkedCustomerFromStartPayload(
+                    $startPayload,
+                    (string) $telegram_id,
+                    $from->getUsername(),
+                    $from->getFirstName(),
+                    $from->getLastName(),
+                );
 
                 return;
             }
@@ -222,6 +240,64 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         }
     }
 
+    private function resolveLinkedCustomerFromStartPayload(
+        string $startPayload,
+        string $telegramId,
+        ?string $telegramUsername,
+        ?string $firstName,
+        ?string $lastName,
+    ): void {
+        $token = substr($startPayload, strlen('link_'));
+        $authLinkService = app(CustomerAuthLinkService::class);
+        $authLink = $authLinkService->getValidTelegramLink($token);
+
+        if (! $authLink) {
+            $this->sendTelegramText($telegramId, 'Ссылка для привязки Telegram устарела или уже была использована. Откройте кабинет и запросите новую ссылку.');
+
+            return;
+        }
+
+        $customer = $authLink->customer()->first();
+
+        if (! $customer) {
+            $this->sendTelegramText($telegramId, 'Не удалось найти аккаунт для привязки. Попробуйте запросить новую ссылку из кабинета.');
+
+            return;
+        }
+
+        $existingCustomer = Customer::withTrashed()
+            ->where('telegram_id', $telegramId)
+            ->first();
+
+        if ($existingCustomer && $existingCustomer->id !== $customer->id) {
+            $this->sendTelegramText($telegramId, 'Этот Telegram-аккаунт уже связан с другим клиентом. Если это ошибка, обратитесь в поддержку.');
+
+            return;
+        }
+
+        if (filled($customer->telegram_id) && $customer->telegram_id !== $telegramId) {
+            $this->sendTelegramText($telegramId, 'У этого кабинета уже привязан другой Telegram-аккаунт. Сначала отвяжите его через поддержку.');
+
+            return;
+        }
+
+        $customer->forceFill([
+            'telegram_id' => $telegramId,
+            'telegram_username' => $telegramUsername,
+            'first_name' => $customer->first_name ?: $firstName,
+            'last_name' => $customer->last_name ?: $lastName,
+        ]);
+
+        if ($customer->trashed()) {
+            $customer->restore();
+        }
+
+        $customer->save();
+        $authLinkService->markAsUsed($authLink);
+
+        $this->sendTelegramText($telegramId, 'Telegram успешно привязан к вашему веб-кабинету. Теперь можно входить в аккаунт и через бота, и через браузер.');
+    }
+
     private function answerCallbackQuery(string $callbackQueryId): void
     {
         try {
@@ -231,6 +307,18 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         } catch (\Throwable $exception) {
             Log::warning('Failed to answer Telegram callback query', [
                 'callback_query_id' => $callbackQueryId,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function sendTelegramText(string $telegramId, string $text): void
+    {
+        try {
+            app(TelegramMessageService::class)->sendText($telegramId, $text);
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to send Telegram message', [
+                'telegram_id' => $telegramId,
                 'message' => $exception->getMessage(),
             ]);
         }
@@ -345,6 +433,11 @@ class ProcessTelegramMainBotMessage implements ShouldQueue
         $keyboard[] = [[
             'text' => '🌐 Открыть веб-кабинет',
             'web_app' => ['url' => $cabinetLinkService->getMiniAppUrl()],
+        ]];
+
+        $keyboard[] = [[
+            'text' => '🔐 Войти в кабинет в браузере',
+            'url' => app(CustomerAuthLinkService::class)->createBrowserLoginUrl($customer),
         ]];
 
         $claimUrl = $onboardingService->getClaimUrl($customer);

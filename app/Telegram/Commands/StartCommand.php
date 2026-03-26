@@ -3,6 +3,7 @@
 namespace App\Telegram\Commands;
 
 use App\Models\TelegramCommandLog;
+use App\Services\CustomerAuthLinkService;
 use App\Services\CustomerCabinetLinkService;
 use App\Telegram\TelegramKeyboard;
 use Telegram\Bot\Laravel\Facades\Telegram;
@@ -26,6 +27,11 @@ class StartCommand extends BaseCommand
         $keyboard[] = [[
             'text' => '🌐 Открыть веб-кабинет',
             'web_app' => ['url' => $cabinetLinkService->getMiniAppUrl()],
+        ]];
+
+        $keyboard[] = [[
+            'text' => '🔐 Войти в кабинет в браузере',
+            'url' => app(CustomerAuthLinkService::class)->createBrowserLoginUrl($this->customer),
         ]];
 
         Telegram::sendMessage([

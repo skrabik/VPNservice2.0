@@ -27,7 +27,7 @@ class CustomerCabinetLinkService
 
     public function getBotUrl(): string
     {
-        $botName = env('TELEGRAM_MAIN_BOT_NAME');
+        $botName = $this->getBotName();
 
         if (filled($botName)) {
             return 'https://t.me/'.$botName;
@@ -36,8 +36,18 @@ class CustomerCabinetLinkService
         return 'https://t.me/quantum_shield_bot';
     }
 
+    public function getBotStartUrl(string $payload): string
+    {
+        return $this->getBotUrl().'?start='.rawurlencode($payload);
+    }
+
     public function getMiniAppUrl(): string
     {
         return route('customer.login', ['source' => 'telegram'], true);
+    }
+
+    private function getBotName(): ?string
+    {
+        return env('TELEGRAM_MAIN_BOT_NAME');
     }
 }

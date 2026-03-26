@@ -90,4 +90,33 @@
             @endif
         </div>
     </section>
+
+    <section class="mt-6">
+        <div class="customer-panel rounded-3xl p-6">
+            <h2 class="customer-page-title text-xl font-semibold">Связка с Telegram</h2>
+
+            @if (filled($customer->telegram_id))
+                <div class="customer-page-text mt-4 space-y-2">
+                    <p>Статус: <span class="font-medium text-white">Telegram подключен</span></p>
+                    <p>Telegram ID: <span class="font-medium text-white">{{ $customer->telegram_id }}</span></p>
+                    <p>Username: <span class="font-medium text-white">{{ $customer->telegram_username ?: 'Не указан' }}</span></p>
+                </div>
+
+                <p class="customer-soft-text mt-4 text-sm">
+                    Этот аккаунт уже синхронизирован с ботом. Для входа из обычного браузера можно использовать кнопку входа в самом Telegram-боте.
+                </p>
+            @else
+                <p class="customer-page-text mt-4 max-w-3xl">
+                    Привяжите Telegram, чтобы бот и веб-кабинет работали с одним аккаунтом. После привязки вы сможете открывать кабинет из бота без отдельной регистрации.
+                </p>
+
+                <form method="POST" action="{{ route('customer.telegram.connect') }}" class="mt-5">
+                    @csrf
+                    <button type="submit" class="customer-button-primary inline-flex rounded-2xl px-4 py-3 font-medium">
+                        Привязать Telegram через бота
+                    </button>
+                </form>
+            @endif
+        </div>
+    </section>
 @endsection

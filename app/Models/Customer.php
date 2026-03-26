@@ -142,4 +142,9 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(CustomerPendingAction::class);
     }
+
+    public function authLinks(): HasMany
+    {
+        return $this->hasMany(CustomerAuthLink::class);
+    }
 }

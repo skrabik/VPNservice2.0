@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Customer;
 
+use App\Jobs\ProcessTelegramMainBotMessage;
 use App\Models\Customer;
+use App\Models\CustomerAuthLink;
+use App\Services\TelegramMessageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
@@ -129,6 +132,93 @@ class CustomerCabinetAuthTest extends TestCase
         $response->assertRedirect(route('customer.login'));
         $response->assertSessionHasErrors('telegram');
         $this->assertGuest('customer');
+    }
+
+    public function test_customer_can_sign_in_via_one_time_browser_link_from_telegram(): void
+    {
+        $customer = Customer::query()->create([
+            'first_name' => 'Roman',
+            'email' => 'roman@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        CustomerAuthLink::query()->create([
+            'customer_id' => $customer->id,
+            'purpose' => CustomerAuthLink::PURPOSE_BROWSER_LOGIN,
+            'token' => 'browser-login-token',
+            'expires_at' => now()->addMinutes(15),
+        ]);
+
+        $response = $this->get(route('customer.telegram.browser-login', ['token' => 'browser-login-token']));
+
+        $this->assertAuthenticated('customer');
+        $response->assertRedirect(route('customer.dashboard'));
+        $response->assertSessionHas('status', 'Вход через Telegram-ссылку выполнен успешно.');
+        $this->assertDatabaseHas('customer_auth_links', [
+            'token' => 'browser-login-token',
+        ]);
+        $this->assertNotNull(CustomerAuthLink::query()->where('token', 'browser-login-token')->value('used_at'));
+
+        $this->post(route('customer.logout'));
+
+        $secondResponse = $this->from(route('customer.login'))
+            ->get(route('customer.telegram.browser-login', ['token' => 'browser-login-token']));
+
+        $secondResponse->assertRedirect(route('customer.login'));
+        $secondResponse->assertSessionHasErrors('telegram');
+        $this->assertGuest('customer');
+    }
+
+    public function test_web_customer_can_link_telegram_without_creating_duplicate_customer(): void
+    {
+        $customer = Customer::query()->create([
+            'first_name' => 'Roman',
+            'email' => 'roman@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        CustomerAuthLink::query()->create([
+            'customer_id' => $customer->id,
+            'purpose' => CustomerAuthLink::PURPOSE_TELEGRAM_LINK,
+            'token' => 'telegram-link-token',
+            'expires_at' => now()->addMinutes(20),
+        ]);
+
+        $telegramMessageService = \Mockery::mock(TelegramMessageService::class);
+        $telegramMessageService->shouldReceive('sendText')
+            ->once()
+            ->with('555777999', \Mockery::type('string'));
+        $this->app->instance(TelegramMessageService::class, $telegramMessageService);
+
+        $update = [
+            'update_id' => 1001,
+            'message' => [
+                'message_id' => 10,
+                'date' => now()->timestamp,
+                'text' => '/start link_telegram-link-token',
+                'from' => [
+                    'id' => 555777999,
+                    'is_bot' => false,
+                    'first_name' => 'Roman',
+                    'username' => 'roman_tg',
+                ],
+                'chat' => [
+                    'id' => 555777999,
+                    'type' => 'private',
+                    'first_name' => 'Roman',
+                    'username' => 'roman_tg',
+                ],
+            ],
+        ];
+
+        (new ProcessTelegramMainBotMessage($update))->handle();
+
+        $customer->refresh();
+
+        $this->assertSame('555777999', $customer->telegram_id);
+        $this->assertSame('roman_tg', $customer->telegram_username);
+        $this->assertDatabaseCount('customers', 1);
+        $this->assertNotNull(CustomerAuthLink::query()->where('token', 'telegram-link-token')->value('used_at'));
     }
 
     private function makeTelegramInitData(array $user): string
