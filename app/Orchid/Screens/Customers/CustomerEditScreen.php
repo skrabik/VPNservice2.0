@@ -103,7 +103,7 @@ class CustomerEditScreen extends Screen
                 ->title(__('Subscriptions'))
                 ->description(__('List of customer subscriptions.'))
                 ->canSee($this->customer->exists),
-                
+
             Layout::block(CustomerVpnKeysLayout::class)
                 ->title(__('VPN Keys'))
                 ->description(__('List of customer VPN keys, including soft-deleted ones.'))
@@ -143,6 +143,7 @@ class CustomerEditScreen extends Screen
         $subscription->fill([
             'date_start' => $validated['subscription']['date_start'],
             'date_end' => $validated['subscription']['date_end'],
+            'expiry_reminder_sent_at' => null,
         ])->save();
 
         Toast::info(__('Subscription was updated.'));

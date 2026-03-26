@@ -16,11 +16,13 @@ class Subscription extends Model
         'plan_id',
         'date_start',
         'date_end',
+        'expiry_reminder_sent_at',
     ];
 
     protected $casts = [
         'date_start' => 'datetime',
         'date_end' => 'datetime',
+        'expiry_reminder_sent_at' => 'datetime',
     ];
 
     public function payments(): HasMany

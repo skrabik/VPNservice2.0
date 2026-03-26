@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Middleware\AuthenticateCustomer;
+use App\Http\Middleware\RedirectIfCustomerAuthenticated;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\AuthenticateCustomer;
-use App\Http\Middleware\RedirectIfCustomerAuthenticated;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,4 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('subscriptions:remind-expiring')->dailyAt('09:00');
+    })
+    ->create();

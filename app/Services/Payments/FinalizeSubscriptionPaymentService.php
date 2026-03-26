@@ -42,6 +42,7 @@ class FinalizeSubscriptionPaymentService
         if ($activeSubscription) {
             $activeSubscription->plan_id = $plan->id;
             $activeSubscription->date_end = $activeSubscription->date_end->copy()->addDays($plan->period);
+            $activeSubscription->expiry_reminder_sent_at = null;
             $activeSubscription->save();
 
             $subscription = $activeSubscription->fresh();
