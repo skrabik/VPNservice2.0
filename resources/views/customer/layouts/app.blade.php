@@ -27,10 +27,12 @@
                 <a href="{{ route('customer.instructions') }}" class="customer-nav-link flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm {{ request()->routeIs('customer.instructions') ? 'customer-nav-link-active' : '' }}">Инструкции</a>
                 <a href="{{ route('customer.support') }}" class="customer-nav-link flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm {{ request()->routeIs('customer.support') ? 'customer-nav-link-active' : '' }}">Поддержка</a>
                 <a href="{{ route('customer.pay') }}" class="customer-nav-link flex min-h-11 items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm {{ request()->routeIs('customer.pay') ? 'customer-nav-link-active' : '' }}">Оплата</a>
-                <form method="POST" action="{{ route('customer.logout') }}" class="col-span-2 sm:col-span-3 lg:ml-auto">
-                    @csrf
-                    <button type="submit" class="customer-button-secondary flex min-h-11 w-full items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm lg:w-auto">Выйти</button>
-                </form>
+                @unless (session('customer.is_telegram_mini_app'))
+                    <form method="POST" action="{{ route('customer.logout') }}" class="col-span-2 sm:col-span-3 lg:ml-auto">
+                        @csrf
+                        <button type="submit" class="customer-button-secondary flex min-h-11 w-full items-center justify-center rounded-2xl px-4 py-2.5 text-center text-sm lg:w-auto">Выйти</button>
+                    </form>
+                @endunless
             </nav>
         </header>
 

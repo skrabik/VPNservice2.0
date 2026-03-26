@@ -86,6 +86,7 @@ class CustomerCabinetAuthTest extends TestCase
 
         $this->assertAuthenticated('customer');
         $response->assertRedirect(route('customer.dashboard'));
+        $response->assertSessionHas('customer.is_telegram_mini_app', true);
 
         $customer->refresh();
 
@@ -107,6 +108,7 @@ class CustomerCabinetAuthTest extends TestCase
 
         $this->assertAuthenticated('customer');
         $response->assertRedirect(route('customer.dashboard'));
+        $response->assertSessionHas('customer.is_telegram_mini_app', true);
         $this->assertDatabaseHas('customers', [
             'telegram_id' => '999',
             'telegram_username' => 'mini_app_user',

@@ -48,6 +48,7 @@ class AuthenticatedSessionController extends Controller
 
         Auth::guard('customer')->login($customer);
         $request->session()->regenerate();
+        $request->session()->forget('customer.is_telegram_mini_app');
 
         return redirect()->intended(route('customer.dashboard'));
     }

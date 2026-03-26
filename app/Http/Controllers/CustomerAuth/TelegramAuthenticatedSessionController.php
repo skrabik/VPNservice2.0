@@ -28,6 +28,7 @@ class TelegramAuthenticatedSessionController extends Controller
 
         Auth::guard('customer')->login($customer);
         $request->session()->regenerate();
+        $request->session()->put('customer.is_telegram_mini_app', true);
 
         return redirect()
             ->intended(route('customer.dashboard'))
