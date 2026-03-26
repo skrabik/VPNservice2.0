@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\TelegramBroadcast;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,7 +14,7 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 
 class SendTelegramBroadcastChunkJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @param  list<string>  $chatIds
@@ -25,6 +26,10 @@ class SendTelegramBroadcastChunkJob implements ShouldQueue
 
     public function handle(): void
     {
+        if ($this->batch()?->cancelled()) {
+            return;
+        }
+
         $broadcast = TelegramBroadcast::query()->find($this->broadcastId);
 
         if (! $broadcast) {
