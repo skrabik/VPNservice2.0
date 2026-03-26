@@ -10,7 +10,7 @@
     </head>
     <body class="customer-theme">
         <div class="customer-shell">
-        <header class="customer-header">
+        <header class="customer-header" data-customer-header>
             <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div class="min-w-0">
                     <a href="{{ route('customer.dashboard') }}" class="customer-brand text-lg font-semibold">Quantum Shield</a>
@@ -59,6 +59,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const webApp = window.Telegram?.WebApp;
+                bindAutoHideHeader();
 
                 if (!webApp) {
                     bindCopyButtons();
@@ -69,6 +70,41 @@
                 webApp.expand();
                 bindCopyButtons();
             });
+
+            function bindAutoHideHeader() {
+                const header = document.querySelector('[data-customer-header]');
+
+                if (!header) {
+                    return;
+                }
+
+                let lastScrollY = window.scrollY;
+                let ticking = false;
+                const minDelta = 12;
+
+                const updateHeaderVisibility = () => {
+                    const currentScrollY = window.scrollY;
+                    const scrollDelta = currentScrollY - lastScrollY;
+
+                    if (currentScrollY <= 16 || scrollDelta < -minDelta) {
+                        header.classList.remove('customer-header-hidden');
+                    } else if (scrollDelta > minDelta) {
+                        header.classList.add('customer-header-hidden');
+                    }
+
+                    lastScrollY = currentScrollY;
+                    ticking = false;
+                };
+
+                window.addEventListener('scroll', () => {
+                    if (ticking) {
+                        return;
+                    }
+
+                    ticking = true;
+                    window.requestAnimationFrame(updateHeaderVisibility);
+                }, { passive: true });
+            }
 
             function bindCopyButtons() {
                 const fallbackCopy = (text) => {
