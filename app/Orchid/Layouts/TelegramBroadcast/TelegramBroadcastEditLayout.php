@@ -21,7 +21,6 @@ class TelegramBroadcastEditLayout extends Rows
                 ->rows(14)
                 ->required()
                 ->title('Текст сообщения')
-                ->help('Поддерживается HTML-разметка Telegram: <b>, <strong>, <i>, <em>, <u>, <ins>, <s>, <strike>, <del>, <code>, <pre>, <a href=\"...\">.')
                 ->placeholder('Введите текст рассылки с HTML-разметкой Telegram'),
 
             CheckBox::make('broadcast.is_test')
