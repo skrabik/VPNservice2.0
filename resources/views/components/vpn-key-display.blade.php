@@ -6,10 +6,10 @@
 
 <div class="{{ $containerClass }}">
     <div class="mb-3 flex items-center justify-between gap-3">
-        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ $label }}</p>
+        <p class="customer-key-label text-xs uppercase tracking-[0.2em]">{{ $label }}</p>
         <button
             type="button"
-            class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-200 transition hover:border-indigo-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+            class="customer-copy-button inline-flex h-10 w-10 items-center justify-center rounded-full focus:outline-none"
             data-copy-vpn-key
             data-copy-text="{{ $value }}"
             data-copy-default-title="Скопировать ключ"
@@ -24,7 +24,7 @@
         </button>
     </div>
 
-    <div class="overflow-x-auto rounded-2xl bg-slate-950 p-4 font-mono text-sm text-emerald-300 break-all">
+    <div class="customer-key-box overflow-x-auto rounded-2xl p-4 font-mono text-sm break-all">
         {{ $value }}
     </div>
 </div>

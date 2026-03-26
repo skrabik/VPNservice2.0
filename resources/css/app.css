@@ -1,3 +1,397 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --customer-bg-start: #cbb2ff;
+        --customer-bg-middle: #8ea6ff;
+        --customer-bg-end: #3f8cff;
+        --customer-surface: rgba(17, 27, 54, 0.26);
+        --customer-surface-strong: rgba(15, 22, 44, 0.38);
+        --customer-surface-soft: rgba(255, 255, 255, 0.12);
+        --customer-surface-contrast: rgba(9, 16, 34, 0.44);
+        --customer-border: rgba(255, 255, 255, 0.2);
+        --customer-border-strong: rgba(255, 255, 255, 0.32);
+        --customer-text: #f7fbff;
+        --customer-text-muted: rgba(247, 251, 255, 0.8);
+        --customer-text-soft: rgba(247, 251, 255, 0.62);
+        --customer-primary-start: #8e77ff;
+        --customer-primary-end: #4c9dff;
+        --customer-primary-shadow: rgba(80, 120, 255, 0.34);
+        --customer-secondary-bg: rgba(255, 255, 255, 0.12);
+        --customer-secondary-bg-hover: rgba(255, 255, 255, 0.18);
+        --customer-field-bg: rgba(255, 255, 255, 0.12);
+        --customer-field-bg-focus: rgba(255, 255, 255, 0.18);
+        --customer-success-bg: rgba(48, 208, 160, 0.16);
+        --customer-success-border: rgba(116, 255, 205, 0.28);
+        --customer-warning-bg: rgba(255, 204, 102, 0.16);
+        --customer-warning-border: rgba(255, 214, 112, 0.28);
+        --customer-danger-bg: rgba(255, 110, 145, 0.16);
+        --customer-danger-border: rgba(255, 148, 173, 0.28);
+        --customer-info-bg: rgba(120, 202, 255, 0.16);
+        --customer-info-border: rgba(164, 224, 255, 0.28);
+    }
+
+    body.customer-theme {
+        min-height: 100vh;
+        color: var(--customer-text);
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.3), transparent 24%),
+            radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.18), transparent 22%),
+            radial-gradient(circle at bottom center, rgba(15, 64, 180, 0.24), transparent 34%),
+            linear-gradient(180deg, var(--customer-bg-start) 0%, var(--customer-bg-middle) 48%, var(--customer-bg-end) 100%);
+        background-attachment: fixed;
+    }
+
+    body.customer-theme::before,
+    body.customer-theme::after {
+        content: "";
+        position: fixed;
+        z-index: 0;
+        inset: auto;
+        pointer-events: none;
+        border-radius: 9999px;
+        filter: blur(60px);
+        opacity: 0.45;
+    }
+
+    body.customer-theme::before {
+        top: 5rem;
+        right: -5rem;
+        width: 16rem;
+        height: 16rem;
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    body.customer-theme::after {
+        bottom: 3rem;
+        left: -3rem;
+        width: 12rem;
+        height: 12rem;
+        background: rgba(129, 166, 255, 0.26);
+    }
+
+    body.customer-theme a,
+    body.customer-theme button,
+    body.customer-theme input,
+    body.customer-theme textarea,
+    body.customer-theme select {
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.2s ease,
+            opacity 0.2s ease;
+    }
+}
+
+@layer components {
+    .customer-shell {
+        position: relative;
+        z-index: 1;
+    }
+
+    .customer-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(39, 62, 126, 0.2);
+        backdrop-filter: blur(22px);
+        box-shadow: 0 18px 40px rgba(15, 25, 54, 0.12);
+    }
+
+    .customer-panel {
+        border: 1px solid var(--customer-border);
+        background:
+            linear-gradient(180deg, rgba(24, 38, 76, 0.34), rgba(18, 30, 61, 0.24)),
+            var(--customer-surface);
+        box-shadow:
+            0 24px 60px rgba(14, 24, 52, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(24px);
+    }
+
+    .customer-panel-soft {
+        border: 1px solid var(--customer-border);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.1));
+        box-shadow:
+            0 24px 60px rgba(14, 24, 52, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(20px);
+    }
+
+    .customer-panel-hero {
+        background:
+            radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 28%),
+            linear-gradient(145deg, rgba(103, 115, 255, 0.28), rgba(60, 155, 255, 0.12)),
+            var(--customer-surface-strong);
+    }
+
+    .customer-brand {
+        color: var(--customer-text);
+        text-shadow: 0 4px 18px rgba(16, 24, 48, 0.16);
+    }
+
+    .customer-subtitle,
+    .customer-copy-hint,
+    .customer-note,
+    .customer-muted,
+    .customer-page-text {
+        color: var(--customer-text-muted);
+    }
+
+    .customer-soft-text {
+        color: var(--customer-text-soft);
+    }
+
+    .customer-kicker {
+        color: rgba(243, 247, 255, 0.88);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+    }
+
+    .customer-page-title {
+        color: var(--customer-text);
+        text-shadow: 0 8px 28px rgba(20, 30, 62, 0.16);
+    }
+
+    .customer-nav-link {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--customer-secondary-bg);
+        color: var(--customer-text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(18px);
+    }
+
+    .customer-nav-link:hover,
+    .customer-nav-link:focus-visible {
+        background: var(--customer-secondary-bg-hover);
+        border-color: rgba(255, 255, 255, 0.16);
+        transform: translateY(-1px);
+    }
+
+    .customer-nav-link-active {
+        border-color: rgba(255, 255, 255, 0.22);
+        background: linear-gradient(135deg, var(--customer-primary-start), var(--customer-primary-end));
+        color: #ffffff;
+        box-shadow: 0 14px 34px var(--customer-primary-shadow);
+    }
+
+    .customer-button-primary {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(135deg, var(--customer-primary-start), var(--customer-primary-end));
+        color: #ffffff;
+        box-shadow: 0 16px 36px var(--customer-primary-shadow);
+    }
+
+    .customer-button-primary:hover,
+    .customer-button-primary:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 40px rgba(80, 120, 255, 0.4);
+    }
+
+    .customer-button-secondary {
+        border: 1px solid var(--customer-border);
+        background: var(--customer-secondary-bg);
+        color: var(--customer-text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+    }
+
+    .customer-button-secondary:hover,
+    .customer-button-secondary:focus-visible {
+        background: var(--customer-secondary-bg-hover);
+        border-color: var(--customer-border-strong);
+        transform: translateY(-1px);
+    }
+
+    .customer-alert {
+        border: 1px solid;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(18px);
+    }
+
+    .customer-alert-success {
+        background: var(--customer-success-bg);
+        border-color: var(--customer-success-border);
+        color: #effff8;
+    }
+
+    .customer-alert-warning {
+        background: var(--customer-warning-bg);
+        border-color: var(--customer-warning-border);
+        color: #fff8e8;
+    }
+
+    .customer-alert-danger {
+        background: var(--customer-danger-bg);
+        border-color: var(--customer-danger-border);
+        color: #fff0f4;
+    }
+
+    .customer-alert-info {
+        background: var(--customer-info-bg);
+        border-color: var(--customer-info-border);
+        color: #eff9ff;
+    }
+
+    .customer-metric {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.09);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+    }
+
+    .customer-metric-label,
+    .customer-field-label {
+        color: var(--customer-text-muted);
+    }
+
+    .customer-metric-value {
+        color: var(--customer-text);
+    }
+
+    .customer-input,
+    .customer-select,
+    .customer-textarea {
+        width: 100%;
+        border: 1px solid var(--customer-border);
+        background: var(--customer-field-bg);
+        color: var(--customer-text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px);
+    }
+
+    .customer-input::placeholder,
+    .customer-textarea::placeholder {
+        color: var(--customer-text-soft);
+    }
+
+    .customer-input:hover,
+    .customer-select:hover,
+    .customer-textarea:hover {
+        border-color: var(--customer-border-strong);
+    }
+
+    .customer-input:focus,
+    .customer-select:focus,
+    .customer-textarea:focus {
+        border-color: rgba(225, 235, 255, 0.64);
+        background: var(--customer-field-bg-focus);
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.08),
+            0 12px 24px rgba(30, 56, 118, 0.16);
+        outline: none;
+    }
+
+    .customer-select option {
+        background: #203865;
+        color: #f7fbff;
+    }
+
+    .customer-key-label {
+        color: var(--customer-text-soft);
+    }
+
+    .customer-copy-button {
+        border: 1px solid var(--customer-border);
+        background: rgba(8, 14, 31, 0.34);
+        color: var(--customer-text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .customer-copy-button:hover,
+    .customer-copy-button:focus-visible {
+        border-color: var(--customer-border-strong);
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .customer-copy-button.customer-copy-button-success {
+        border-color: rgba(146, 255, 215, 0.44);
+        color: #d8fff0;
+        background: rgba(48, 208, 160, 0.18);
+    }
+
+    .customer-key-box {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background:
+            linear-gradient(180deg, rgba(8, 13, 29, 0.54), rgba(14, 19, 38, 0.76)),
+            var(--customer-surface-contrast);
+        color: #c0ffea;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .customer-empty-state {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--customer-text-muted);
+    }
+
+    .customer-ticket-reply {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(10, 18, 38, 0.28);
+    }
+
+    .customer-status-badge {
+        border: 1px solid;
+        backdrop-filter: blur(12px);
+    }
+
+    .customer-status-badge-new {
+        background: var(--customer-warning-bg);
+        border-color: var(--customer-warning-border);
+        color: #fff4dc;
+    }
+
+    .customer-status-badge-answered {
+        background: var(--customer-success-bg);
+        border-color: var(--customer-success-border);
+        color: #e8fff6;
+    }
+
+    .customer-status-badge-closed {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: var(--customer-text-muted);
+    }
+
+    .customer-pill {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--customer-text-muted);
+    }
+
+    .customer-pill-active {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, var(--customer-primary-start), var(--customer-primary-end));
+        color: #ffffff;
+        box-shadow: 0 12px 28px rgba(74, 133, 255, 0.28);
+    }
+
+    .customer-prose {
+        color: var(--customer-text);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .customer-prose :where(h1, h2, h3, h4, strong, code) {
+        color: var(--customer-text);
+    }
+
+    .customer-prose :where(p, li, blockquote) {
+        color: var(--customer-text-muted);
+    }
+
+    .customer-prose :where(a) {
+        color: #f2f7ff;
+        text-decoration-color: rgba(242, 247, 255, 0.44);
+    }
+
+    .customer-prose :where(hr) {
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+}
