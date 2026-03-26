@@ -6,7 +6,6 @@
 @section('content')
     <section class="customer-panel customer-panel-hero rounded-3xl p-6">
         <h1 class="customer-page-title text-3xl font-semibold">Инструкции по подключению</h1>
-        <p class="customer-page-text mt-3">Контент синхронизирован с Telegram-командой `/instructions`.</p>
 
         <div class="mt-6 flex flex-wrap gap-3">
             @foreach ($platforms as $platform)

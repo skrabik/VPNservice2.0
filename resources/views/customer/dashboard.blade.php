@@ -6,11 +6,7 @@
 @section('content')
     <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <section class="customer-panel customer-panel-hero rounded-3xl p-6">
-            <p class="customer-kicker text-sm">Обзор</p>
             <h1 class="customer-page-title mt-3 text-3xl font-semibold">Здравствуйте, {{ $customer->first_name }}.</h1>
-            <p class="customer-page-text mt-3 max-w-2xl">
-                Здесь собраны все основные действия из Telegram-бота: проверка подписки, получение ключей, инструкции и поддержка.
-            </p>
 
             @if (! $overview['has_active_subscription'])
                 <div class="customer-alert customer-alert-warning mt-6 rounded-2xl p-5">

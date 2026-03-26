@@ -64,11 +64,7 @@ class CustomerInstructionService
 
     public function getPlatformSelectionText(): string
     {
-        return implode("\n", [
-            '📱 <b>Инструкции по подключению</b>',
-            '',
-            'Выберите ваше устройство ниже, и я покажу подходящую инструкцию по подключению VPN.',
-        ]);
+        return 'Выберите ваше устройство ниже, и я покажу подходящую инструкцию по подключению VPN.';
     }
 
     private function getAndroidInstructions(): string

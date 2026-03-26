@@ -5,7 +5,7 @@
 
 @section('content')
     <section class="customer-panel customer-panel-hero rounded-3xl p-6">
-        <h1 class="customer-page-title text-3xl font-semibold">Статус подписки</h1>
+        <h1 class="customer-page-title text-3xl font-semibold">Моя подписка</h1>
 
         @if (! $overview['has_active_subscription'])
             <div class="customer-alert customer-alert-warning mt-6 rounded-2xl p-5">
