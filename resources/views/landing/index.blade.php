@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nerpa VPN — быстрый и приватный доступ в интернет</title>
-    <meta name="description" content="NerpaVPN — VPN с оплатой и ключами через Telegram, личный кабинет и поддержка. Шифрование, без логов активности, стабильные серверы.">
+    <meta name="description" content="NerpaVPN — VPN с веб-кабинетом: подписка, ключи и поддержка в браузере. Оплату и быстрый старт удобно пройти через Telegram-бота.">
     <meta name="keywords" content="NerpaVPN, Nerpa VPN, VPN, Telegram, приватность, безопасный интернет">
     <link rel="icon" type="image/jpeg" href="{{ asset('images/branding/nerpa-logo.jpg') }}">
     <link rel="shortcut icon" href="{{ asset('images/branding/nerpa-logo.jpg') }}">
@@ -26,13 +26,17 @@
                 <nav class="hidden items-center gap-8 md:flex" aria-label="Основная навигация">
                     <a href="#how" class="nerpa-nav-link">Как это работает</a>
                     <a href="#features" class="nerpa-nav-link">Возможности</a>
-                    <a href="#pricing" class="nerpa-nav-link">Тарифы</a>
+                    <a href="#pricing" class="nerpa-nav-link">Тариф</a>
                     <a href="#support" class="nerpa-nav-link">Поддержка</a>
                 </nav>
-                <div class="flex items-center gap-3">
-                    <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary hidden text-sm sm:inline-flex">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <a href="{{ route('customer.login') }}" class="nerpa-btn-primary hidden text-sm sm:inline-flex">
+                        <i class="fa-solid fa-globe text-lg" aria-hidden="true"></i>
+                        Войти в кабинет
+                    </a>
+                    <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-ghost hidden text-sm md:inline-flex">
                         <i class="fa-brands fa-telegram text-lg" aria-hidden="true"></i>
-                        Открыть бота
+                        Telegram-бот
                     </a>
                     <button type="button" class="nerpa-nav-link p-2 md:hidden mobile-menu-toggle" aria-expanded="false" aria-controls="nerpa-mobile-nav">
                         <i class="fa-solid fa-bars text-xl" aria-hidden="true"></i>
@@ -43,11 +47,15 @@
                 <div class="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
                     <a href="#how" class="nerpa-nav-link rounded-xl px-3 py-3 hover:bg-white/5">Как это работает</a>
                     <a href="#features" class="nerpa-nav-link rounded-xl px-3 py-3 hover:bg-white/5">Возможности</a>
-                    <a href="#pricing" class="nerpa-nav-link rounded-xl px-3 py-3 hover:bg-white/5">Тарифы</a>
+                    <a href="#pricing" class="nerpa-nav-link rounded-xl px-3 py-3 hover:bg-white/5">Тариф</a>
                     <a href="#support" class="nerpa-nav-link rounded-xl px-3 py-3 hover:bg-white/5">Поддержка</a>
-                    <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary mt-2 justify-center text-sm">
+                    <a href="{{ route('customer.login') }}" class="nerpa-btn-primary mt-2 justify-center text-sm">
+                        <i class="fa-solid fa-globe text-lg" aria-hidden="true"></i>
+                        Войти в кабинет
+                    </a>
+                    <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-ghost mt-2 justify-center text-sm">
                         <i class="fa-brands fa-telegram text-lg" aria-hidden="true"></i>
-                        Открыть бота
+                        Telegram-бот
                     </a>
                 </div>
             </div>
@@ -56,22 +64,22 @@
         <section class="nerpa-hero relative z-10">
             <div class="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-4 lg:grid-cols-2">
                 <div>
-                    <h1 class="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                        VPN с удобным
-                        <span class="nerpa-text-gradient">веб-кабинетом для управления</span>
+                    <h1 class="mb-8 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+                        Управление VPN в
+                        <span class="nerpa-text-gradient">веб-кабинете</span>
                     </h1>
                     <p class="mb-8 max-w-xl text-lg leading-relaxed text-[color:var(--nerpa-text-muted)]">
-                        Оформляйте подписку через Telegram, а дальше управляйте сервисом в браузере: проверяйте статус,
-                        копируйте ключи, открывайте инструкции и быстро обращайтесь в поддержку из веб-кабинета.
+                        В браузере удобно смотреть подписку, копировать ключи, открывать инструкции и писать в поддержку.
+                        Первую оплату и быстрый доступ к сервису по-прежнему можно оформить через Telegram-бота.
                     </p>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary px-8 py-3.5 text-base">
-                            <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
-                            Начать в Telegram
+                        <a href="{{ route('customer.login') }}" class="nerpa-btn-primary px-8 py-3.5 text-base">
+                            <i class="fa-solid fa-globe text-xl" aria-hidden="true"></i>
+                            Войти в кабинет
                         </a>
-                        <a href="#how" class="nerpa-btn-ghost px-8 py-3.5 text-base">
-                            <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
-                            Как подключиться
+                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-ghost px-8 py-3.5 text-base">
+                            <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
+                            Оплата и бот в Telegram
                         </a>
                     </div>
                     <div class="nerpa-highlight-list mt-6 flex flex-wrap gap-3">
@@ -141,30 +149,30 @@
         <section id="how" class="relative z-10 py-20">
             <div class="mx-auto max-w-6xl px-4">
                 <div class="mb-12 max-w-2xl">
-                    <h2 class="text-3xl font-bold text-white sm:text-4xl">Три шага до VPN и веб-кабинета</h2>
+                    <h2 class="text-3xl font-bold text-white sm:text-4xl">Три шага до VPN</h2>
                     <p class="mt-3 text-lg text-[color:var(--nerpa-text-muted)]">
-                        Telegram нужен для быстрого старта, а основное управление сервисом доступно в понятном кабинете в браузере.
+                        Главная точка входа для ежедневной работы — веб-кабинет. Telegram удобен для первой оплаты и быстрого получения доступа.
                     </p>
                 </div>
                 <div class="grid gap-6 md:grid-cols-3">
                     <article class="nerpa-card nerpa-reveal p-6 sm:p-8">
                         <p class="nerpa-step-num mb-3">Шаг 1</p>
                         <div class="nerpa-icon-wrap mb-4 w-12 h-12">
-                            <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
+                            <i class="fa-solid fa-globe text-xl" aria-hidden="true"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">Вход через Telegram</h3>
+                        <h3 class="text-xl font-semibold text-white">Веб-кабинет</h3>
                         <p class="mt-2 text-[color:var(--nerpa-text-muted)]">
-                            Запустите бота NerpaVPN, выберите тариф и подтвердите вход. Это самый быстрый способ попасть в свой аккаунт.
+                            Войдите в личный кабинет в браузере: там подписка, ключи, инструкции и поддержка — всё в одном месте.
                         </p>
                     </article>
                     <article class="nerpa-card nerpa-reveal p-6 sm:p-8">
                         <p class="nerpa-step-num mb-3">Шаг 2</p>
                         <div class="nerpa-icon-wrap mb-4 w-12 h-12">
-                            <i class="fa-solid fa-globe text-xl" aria-hidden="true"></i>
+                            <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">Откройте веб-кабинет</h3>
+                        <h3 class="text-xl font-semibold text-white">Telegram при первом подключении</h3>
                         <p class="mt-2 text-[color:var(--nerpa-text-muted)]">
-                            В кабинете видно всё главное: активную подписку, доступные действия, инструкции и быстрые переходы по сервису.
+                            Если нужно оформить подписку или получить доступ в пару кликов, воспользуйтесь ботом NerpaVPN — затем снова возвращайтесь в кабинет.
                         </p>
                     </article>
                     <article class="nerpa-card nerpa-reveal p-6 sm:p-8">
@@ -251,53 +259,30 @@
         <section id="pricing" class="relative z-10 py-20">
             <div class="mx-auto max-w-6xl px-4">
                 <div class="mb-12 text-center">
-                    <h2 class="text-3xl font-bold text-white sm:text-4xl">Тарифы</h2>
+                    <h2 class="text-3xl font-bold text-white sm:text-4xl">Тариф</h2>
                     <p class="mx-auto mt-3 max-w-2xl text-lg text-[color:var(--nerpa-text-muted)]">
-                        Ниже ориентиры по планам. Подключение начинается в Telegram, а дальше тарифом и доступом удобно управлять через кабинет.
+                        Одна помесячная подписка: управляйте ею в веб-кабинете. Оплату и актуальную сумму удобнее смотреть в Telegram-боте.
                     </p>
                 </div>
-                <div class="grid gap-6 lg:grid-cols-3">
-                    <div class="nerpa-price-card nerpa-reveal flex flex-col p-8">
-                        <h3 class="text-xl font-bold text-white">Старт</h3>
-                        <p class="mt-2 text-sm text-[color:var(--nerpa-text-soft)]">Для одного устройства и нерегулярного использования</p>
-                        <p class="mt-6 text-4xl font-extrabold text-white">299&nbsp;₽</p>
-                        <p class="text-sm text-[color:var(--nerpa-text-muted)]">в месяц</p>
-                        <ul class="mt-8 flex flex-1 flex-col gap-3 text-sm text-[color:var(--nerpa-text-muted)]">
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Базовая скорость</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Доступ к серверам</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Поддержка в Telegram</li>
-                        </ul>
-                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary mt-8 w-full py-3">
-                            Выбрать в боте
-                        </a>
-                    </div>
-                    <div class="nerpa-price-card nerpa-price-featured nerpa-reveal relative flex flex-col p-8">
-                        <span class="nerpa-badge absolute -top-3 left-1/2 -translate-x-1/2">Популярный</span>
-                        <h3 class="text-xl font-bold text-white">Оптима</h3>
-                        <p class="mt-2 text-sm text-[color:var(--nerpa-text-soft)]">Баланс цены и скорости для работы и развлечений</p>
+                <div class="mx-auto flex max-w-md justify-center">
+                    <div class="nerpa-price-card nerpa-price-featured nerpa-reveal relative flex w-full flex-col p-8">
+                        <span class="nerpa-badge absolute -top-3 left-1/2 -translate-x-1/2">На месяц</span>
+                        <h3 class="text-xl font-bold text-white">NerpaVPN</h3>
+                        <p class="mt-2 text-sm text-[color:var(--nerpa-text-soft)]">Доступ к серверам, веб-кабинет, ключи и поддержка</p>
                         <p class="mt-6 text-4xl font-extrabold text-white">499&nbsp;₽</p>
                         <p class="text-sm text-[color:var(--nerpa-text-muted)]">в месяц</p>
                         <ul class="mt-8 flex flex-1 flex-col gap-3 text-sm text-[color:var(--nerpa-text-muted)]">
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Повышенная скорость</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Несколько устройств</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Приоритет ответа поддержки</li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Доступ к серверам и локациям</li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Веб-кабинет: подписка, ключи, инструкции</li>
+                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Поддержка в Telegram</li>
                         </ul>
-                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary mt-8 w-full py-3">
-                            Выбрать в боте
+                        <a href="{{ route('customer.login') }}" class="nerpa-btn-primary mt-8 w-full justify-center gap-2 py-3">
+                            <i class="fa-solid fa-globe text-lg" aria-hidden="true"></i>
+                            Войти в кабинет
                         </a>
-                    </div>
-                    <div class="nerpa-price-card nerpa-reveal flex flex-col p-8">
-                        <h3 class="text-xl font-bold text-white">Макс</h3>
-                        <p class="mt-2 text-sm text-[color:var(--nerpa-text-soft)]">Максимум скорости и устройств для семьи или команды</p>
-                        <p class="mt-6 text-4xl font-extrabold text-white">799&nbsp;₽</p>
-                        <p class="text-sm text-[color:var(--nerpa-text-muted)]">в месяц</p>
-                        <ul class="mt-8 flex flex-1 flex-col gap-3 text-sm text-[color:var(--nerpa-text-muted)]">
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Максимальная скорость</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> Расширенный лимит устройств</li>
-                            <li class="flex gap-2"><i class="fa-solid fa-check mt-0.5 text-emerald-400" aria-hidden="true"></i> VIP-поддержка</li>
-                        </ul>
-                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary mt-8 w-full py-3">
-                            Выбрать в боте
+                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-ghost mt-3 w-full justify-center gap-2 py-3">
+                            <i class="fa-brands fa-telegram text-lg" aria-hidden="true"></i>
+                            Оплатить в боте
                         </a>
                     </div>
                 </div>
@@ -309,12 +294,18 @@
                 <div class="nerpa-cta-band px-8 py-12 text-center sm:px-12">
                     <h2 class="text-2xl font-bold text-white sm:text-3xl">Откройте NerpaVPN и управляйте через веб-кабинет</h2>
                     <p class="mx-auto mt-3 max-w-xl text-[color:var(--nerpa-text-muted)]">
-                        Начните в Telegram, затем пользуйтесь веб-кабинетом для подписки, ключей, инструкций и связи с поддержкой.
+                        Заходите в веб-кабинет для подписки, ключей и поддержки. Для оплаты и мгновенного старта рядом всегда есть Telegram-бот.
                     </p>
-                    <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-primary mt-8 inline-flex px-10 py-3.5 text-base">
-                        <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
-                        Открыть бот и кабинет
-                    </a>
+                    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                        <a href="{{ route('customer.login') }}" class="nerpa-btn-primary inline-flex px-10 py-3.5 text-base">
+                            <i class="fa-solid fa-globe text-xl" aria-hidden="true"></i>
+                            Открыть веб-кабинет
+                        </a>
+                        <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-btn-ghost inline-flex px-10 py-3.5 text-base">
+                            <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
+                            Перейти в бота
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -330,7 +321,7 @@
                             <span class="nerpa-brand">NerpaVPN</span>
                         </div>
                         <p class="mt-4 max-w-md text-sm leading-relaxed text-[color:var(--nerpa-text-muted)]">
-                            Nerpa VPN — сервис доступа в интернет с быстрым входом через Telegram и акцентом на удобный веб-кабинет для ежедневного управления.
+                            Nerpa VPN — сервис с веб-кабинетом для ежедневного управления подпиской и ключами; Telegram-бот остаётся удобным способом оплаты и быстрого старта.
                         </p>
                         <a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-[#6e64ff] to-[#2f8cff] text-white transition hover:opacity-90" aria-label="Telegram NerpaVPN">
                             <i class="fa-brands fa-telegram text-xl" aria-hidden="true"></i>
@@ -339,8 +330,9 @@
                     <div>
                         <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Сервис</h3>
                         <ul class="mt-4 space-y-2 text-sm">
+                            <li><a href="{{ route('customer.login') }}" class="nerpa-link-muted">Веб-кабинет</a></li>
                             <li><a href="#features" class="nerpa-link-muted">Возможности</a></li>
-                            <li><a href="#pricing" class="nerpa-link-muted">Тарифы</a></li>
+                            <li><a href="#pricing" class="nerpa-link-muted">Тариф</a></li>
                             <li><a href="{{ $telegramBotUrl }}" target="_blank" rel="noopener noreferrer" class="nerpa-link-muted">Telegram-бот</a></li>
                         </ul>
                     </div>
