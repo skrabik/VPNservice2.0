@@ -110,6 +110,7 @@ class ThreeXuiService
         $streamSettings = $inbound->decodeStreamSettings();
         $realitySettings = $streamSettings['realitySettings'] ?? [];
         $realityInnerSettings = $realitySettings['settings'] ?? [];
+        $displayName = $this->buildKeyDisplayName($inbound);
 
         if (! is_string($clientId) || trim($clientId) === '') {
             throw new RuntimeException('3X-UI client UUID is missing for VLESS URI generation.');
@@ -137,7 +138,7 @@ class ThreeXuiService
             $serverHost,
             $inbound->port,
             http_build_query($query),
-            rawurlencode(trim(($inbound->remark ?: '3X-UI').' '.$client['email']))
+            rawurlencode($displayName)
         );
     }
 
@@ -285,6 +286,18 @@ class ThreeXuiService
         }
 
         return null;
+    }
+
+    private function buildKeyDisplayName(ServerInbound $inbound): string
+    {
+        $serverLabel = trim((string) ($this->server->hostname ?: $this->server->ip_address));
+        $inboundLabel = trim((string) $inbound->remark);
+
+        return implode(' | ', array_filter([
+            'NerpaVPN',
+            $serverLabel !== '' ? $serverLabel : null,
+            $inboundLabel !== '' ? $inboundLabel : null,
+        ]));
     }
 
     private function resolveServerHost(): string

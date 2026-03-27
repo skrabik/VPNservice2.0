@@ -25,7 +25,7 @@ class HelpCommand extends BaseCommand
             'action' => 'Вызвал команду /help',
         ]);
 
-        $message = "🤖 <b>VPN Бот - Помощь</b>\n\n".
+        $message = "🤖 <b>NerpaVPN — помощь</b>\n\n".
                   "Доступные разделы:";
 
         $keyboard = TelegramKeyboard::mainMenu();

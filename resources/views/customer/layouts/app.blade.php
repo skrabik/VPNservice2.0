@@ -13,7 +13,7 @@
         <header class="customer-header" data-customer-header>
             <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div class="min-w-0">
-                    <a href="{{ route('customer.dashboard') }}" class="customer-brand text-lg font-semibold">Quantum Shield</a>
+                    <a href="{{ route('customer.dashboard') }}" class="customer-brand text-lg font-semibold">NerpaVPN</a>
                 </div>
                 <div class="customer-panel-soft min-w-0 rounded-3xl px-4 py-3 sm:text-right">
                     <p class="font-medium text-white">{{ auth('customer')->user()->first_name }}</p>

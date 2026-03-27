@@ -1,171 +1,487 @@
-/* Дополнительные стили для лендинга */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Анимации для элементов */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+/*
+ * Палитра совпадает с личным кабинетом (resources/css/app.css — customer-theme).
+ */
+@layer base {
+    :root {
+        --nerpa-bg-start: #2f0f5f;
+        --nerpa-bg-middle: #372d97;
+        --nerpa-bg-end: #081a3c;
+        --nerpa-surface: rgba(12, 20, 42, 0.72);
+        --nerpa-surface-strong: rgba(8, 14, 34, 0.88);
+        --nerpa-border: rgba(255, 255, 255, 0.16);
+        --nerpa-border-strong: rgba(255, 255, 255, 0.28);
+        --nerpa-text: #f7fbff;
+        --nerpa-text-muted: rgba(247, 251, 255, 0.84);
+        --nerpa-text-soft: rgba(247, 251, 255, 0.68);
+        --nerpa-primary-start: #7c3aed;
+        --nerpa-primary-mid: #6366f1;
+        --nerpa-primary-end: #38bdf8;
+        --nerpa-primary-shadow: rgba(109, 67, 226, 0.48);
+        --nerpa-accent: #c4b5fd;
+        --nerpa-accent-pink: #ec4899;
+        --nerpa-accent-cyan: #67e8f9;
+        --nerpa-accent-purple-soft: #e9d5ff;
     }
 
-    to {
+    .nerpa-landing {
+        min-height: 100vh;
+        color: var(--nerpa-text);
+        background:
+            radial-gradient(circle at 14% 12%, rgba(236, 72, 153, 0.18), transparent 24%),
+            radial-gradient(circle at 85% 10%, rgba(124, 58, 237, 0.34), transparent 24%),
+            radial-gradient(circle at 52% 20%, rgba(139, 92, 246, 0.18), transparent 28%),
+            radial-gradient(circle at 72% 34%, rgba(56, 189, 248, 0.14), transparent 26%),
+            radial-gradient(circle at bottom center, rgba(88, 28, 135, 0.26), transparent 34%),
+            linear-gradient(180deg, var(--nerpa-bg-start) 0%, var(--nerpa-bg-middle) 48%, var(--nerpa-bg-end) 100%);
+        background-attachment: fixed;
+        font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .nerpa-landing::before,
+    .nerpa-landing::after {
+        content: "";
+        position: fixed;
+        z-index: 0;
+        pointer-events: none;
+        border-radius: 9999px;
+        filter: blur(72px);
+        opacity: 0.32;
+    }
+
+    .nerpa-landing::before {
+        top: 3rem;
+        right: -5rem;
+        width: 22rem;
+        height: 22rem;
+        background: rgba(124, 58, 237, 0.34);
+    }
+
+    .nerpa-landing::after {
+        bottom: 2rem;
+        left: -4rem;
+        width: 18rem;
+        height: 18rem;
+        background: rgba(147, 51, 234, 0.24);
+    }
+}
+
+@layer components {
+    .nerpa-shell {
+        position: relative;
+        z-index: 1;
+    }
+
+    .nerpa-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+            linear-gradient(90deg, rgba(124, 58, 237, 0.16), rgba(168, 85, 247, 0.08), rgba(56, 189, 248, 0.03)),
+            rgba(9, 19, 44, 0.82);
+        backdrop-filter: blur(22px);
+        box-shadow: 0 18px 40px rgba(6, 12, 28, 0.34);
+    }
+
+    .nerpa-logo-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0.18rem;
+        border-radius: 0.9rem;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow:
+            0 12px 28px rgba(109, 67, 226, 0.22),
+            0 0 24px rgba(124, 58, 237, 0.14);
+    }
+
+    .nerpa-logo-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.72rem;
+    }
+
+    .nerpa-brand {
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: -0.02em;
+        color: var(--nerpa-text);
+        text-shadow: 0 4px 18px rgba(16, 24, 48, 0.2);
+    }
+
+    .nerpa-nav-link {
+        color: var(--nerpa-text-soft);
+        font-size: 0.9375rem;
+        font-weight: 500;
+    }
+
+    .nerpa-nav-link:hover {
+        color: var(--nerpa-accent-purple-soft);
+    }
+
+    .nerpa-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(135deg, var(--nerpa-primary-start), var(--nerpa-primary-mid) 50%, var(--nerpa-primary-end));
+        box-shadow: 0 16px 36px var(--nerpa-primary-shadow);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            filter 0.2s ease;
+    }
+
+    .nerpa-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 22px 48px rgba(89, 90, 255, 0.4);
+        filter: saturate(1.08);
+    }
+
+    .nerpa-btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        color: var(--nerpa-text);
+        border: 1px solid var(--nerpa-border);
+        background:
+            linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(56, 189, 248, 0.04)),
+            rgba(18, 30, 63, 0.55);
+        backdrop-filter: blur(16px);
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .nerpa-btn-ghost:hover {
+        background:
+            linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(56, 189, 248, 0.05)),
+            rgba(27, 43, 88, 0.72);
+        border-color: rgba(196, 181, 253, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 16px 32px rgba(109, 67, 226, 0.16);
+    }
+
+    .nerpa-hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding-top: 5rem;
+        padding-bottom: 4rem;
+        overflow: hidden;
+    }
+
+    .nerpa-hero::before {
+        content: "";
+        position: absolute;
+        top: 6rem;
+        right: 8%;
+        width: 24rem;
+        height: 24rem;
+        border-radius: 9999px;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.38) 0%, rgba(168, 85, 247, 0.22) 44%, rgba(56, 189, 248, 0.1) 62%, transparent 78%);
+        filter: blur(18px);
+        pointer-events: none;
+    }
+
+    .nerpa-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 255, 255, 0.08), transparent),
+            linear-gradient(90deg, rgba(124, 58, 237, 0.14), rgba(168, 85, 247, 0.06) 30%, transparent 48%, rgba(56, 189, 248, 0.06));
+        pointer-events: none;
+    }
+
+    .nerpa-kicker {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #ddd6fe;
+        text-shadow: 0 0 24px rgba(124, 58, 237, 0.28);
+    }
+
+    .nerpa-highlight-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.7rem 0.95rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+            linear-gradient(135deg, rgba(124, 58, 237, 0.24), rgba(168, 85, 247, 0.14), rgba(56, 189, 248, 0.05)),
+            rgba(13, 22, 48, 0.52);
+        color: var(--nerpa-text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        backdrop-filter: blur(16px);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.06),
+            0 10px 24px rgba(8, 14, 34, 0.16),
+            0 0 24px rgba(124, 58, 237, 0.1);
+    }
+
+    .nerpa-highlight-pill i {
+        color: #d8b4fe;
+    }
+
+    .nerpa-panel {
+        border: 1px solid var(--nerpa-border);
+        border-radius: 1.5rem;
+        background:
+            linear-gradient(180deg, rgba(111, 76, 255, 0.12), rgba(31, 47, 93, 0.42), rgba(14, 24, 50, 0.32)),
+            var(--nerpa-surface);
+        box-shadow:
+            0 24px 60px rgba(6, 12, 28, 0.32),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(24px);
+    }
+
+    .nerpa-panel-strong {
+        border: 1px solid var(--nerpa-border);
+        border-radius: 1.5rem;
+        background: linear-gradient(145deg, rgba(124, 58, 237, 0.34), rgba(168, 85, 247, 0.18), rgba(56, 189, 248, 0.1)),
+            var(--nerpa-surface-strong);
+        box-shadow:
+            0 28px 64px rgba(6, 12, 28, 0.36),
+            0 0 0 1px rgba(124, 58, 237, 0.12),
+            0 0 40px rgba(124, 58, 237, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(22px);
+    }
+
+    .nerpa-card {
+        border: 1px solid var(--nerpa-border);
+        border-radius: 1.25rem;
+        background:
+            linear-gradient(180deg, rgba(124, 58, 237, 0.14), rgba(168, 85, 247, 0.05), rgba(56, 189, 248, 0.02)),
+            rgba(14, 25, 54, 0.55);
+        backdrop-filter: blur(18px);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .nerpa-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--nerpa-border-strong);
+        box-shadow:
+            0 20px 48px rgba(6, 12, 28, 0.28),
+            0 0 28px rgba(124, 58, 237, 0.12);
+    }
+
+    .nerpa-icon-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.46), rgba(168, 85, 247, 0.28), rgba(56, 189, 248, 0.16));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #f3e8ff;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 0 24px rgba(124, 58, 237, 0.1);
+    }
+
+    .nerpa-step-num {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #c4b5fd;
+    }
+
+    .nerpa-price-card {
+        border-radius: 1.25rem;
+        border: 1px solid var(--nerpa-border);
+        background:
+            linear-gradient(180deg, rgba(124, 58, 237, 0.16), rgba(168, 85, 247, 0.06), rgba(56, 189, 248, 0.03)),
+            rgba(14, 25, 54, 0.62);
+        backdrop-filter: blur(20px);
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+    .nerpa-price-card:hover {
+        transform: translateY(-6px);
+        box-shadow:
+            0 28px 56px rgba(6, 12, 28, 0.35),
+            0 0 32px rgba(124, 58, 237, 0.14);
+    }
+
+    .nerpa-price-featured {
+        border-color: rgba(255, 255, 255, 0.28);
+        background: linear-gradient(180deg, rgba(109, 40, 217, 0.82), rgba(67, 56, 202, 0.76), rgba(22, 40, 88, 0.74));
+        box-shadow:
+            0 24px 52px rgba(74, 110, 220, 0.22),
+            0 0 42px rgba(124, 58, 237, 0.24);
+    }
+
+    .nerpa-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--nerpa-accent-pink), var(--nerpa-primary-start), var(--nerpa-primary-end));
+        color: #fff;
+        box-shadow: 0 8px 20px var(--nerpa-primary-shadow);
+    }
+
+    .nerpa-cta-band {
+        border: 1px solid var(--nerpa-border);
+        border-radius: 1.5rem;
+        background:
+            radial-gradient(circle at top left, rgba(236, 72, 153, 0.18), transparent 32%),
+            radial-gradient(circle at 78% 24%, rgba(168, 85, 247, 0.16), transparent 24%),
+            linear-gradient(135deg, rgba(124, 58, 237, 0.42), rgba(168, 85, 247, 0.24), rgba(56, 189, 248, 0.14));
+        box-shadow:
+            0 24px 60px rgba(6, 12, 28, 0.3),
+            0 0 48px rgba(124, 58, 237, 0.18);
+    }
+
+    .nerpa-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background:
+            linear-gradient(180deg, rgba(124, 58, 237, 0.05), transparent 32%),
+            rgba(5, 10, 24, 0.72);
+        backdrop-filter: blur(20px);
+    }
+
+    .nerpa-link-muted {
+        color: var(--nerpa-text-soft);
+    }
+
+    .nerpa-link-muted:hover {
+        color: var(--nerpa-text);
+    }
+
+    .nerpa-stat-value {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #fff;
+        text-shadow:
+            0 4px 20px rgba(0, 0, 0, 0.2),
+            0 0 24px rgba(124, 58, 237, 0.12);
+    }
+
+    .nerpa-stat-label {
+        font-size: 0.8125rem;
+        color: var(--nerpa-text-muted);
+    }
+
+    .nerpa-reveal {
+        opacity: 0;
+        transform: translateY(1.5rem);
+        transition:
+            opacity 0.55s ease,
+            transform 0.55s ease;
+    }
+
+    .nerpa-reveal.nerpa-reveal-visible {
         opacity: 1;
         transform: translateY(0);
     }
-}
 
-@keyframes fadeInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
+    .nerpa-mobile-menu {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background:
+            linear-gradient(180deg, rgba(124, 58, 237, 0.08), rgba(56, 189, 248, 0.02)),
+            rgba(9, 19, 44, 0.95);
+        backdrop-filter: blur(16px);
     }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
+    #how,
+    #features,
+    #pricing {
+        position: relative;
+        overflow: hidden;
     }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Применение анимаций */
-.animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out;
-}
-
-.animate-fade-in-left {
-    animation: fadeInLeft 0.8s ease-out;
-}
-
-.animate-fade-in-right {
-    animation: fadeInRight 0.8s ease-out;
-}
-
-/* Улучшенные эффекты наведения */
-.feature-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.feature-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-/* Градиентные кнопки */
-.btn-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    transition: all 0.3s ease;
-}
-
-.btn-gradient:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-}
-
-/* Эффект параллакса для фона */
-.parallax-bg {
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-/* Улучшенные карточки тарифов */
-.pricing-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.pricing-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.5s;
-}
-
-.pricing-card:hover::before {
-    left: 100%;
-}
-
-.pricing-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-}
-
-/* Адаптивные улучшения */
-@media (max-width: 768px) {
-    .hero-pattern {
-        background-image: none;
+    #how::before,
+    #features::before,
+    #pricing::before {
+        content: "";
+        position: absolute;
+        inset: auto;
+        width: 22rem;
+        height: 22rem;
+        border-radius: 9999px;
+        filter: blur(72px);
+        opacity: 0.18;
+        pointer-events: none;
     }
 
-    .floating {
-        animation: none;
+    #how::before {
+        top: 1rem;
+        left: -8rem;
+        background: rgba(124, 58, 237, 0.45);
     }
 
-    .pulse-glow {
-        animation: none;
+    #features::before {
+        top: 2rem;
+        right: -8rem;
+        background: rgba(168, 85, 247, 0.34);
+    }
+
+    #pricing::before {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(124, 58, 237, 0.34);
     }
 }
 
-/* Темная тема (опционально) */
-@media (prefers-color-scheme: dark) {
-    .dark-mode-toggle {
-        display: block;
+@layer utilities {
+    .nerpa-text-gradient {
+        background: linear-gradient(135deg, #fff7ff 0%, #e9d5ff 24%, #c084fc 52%, #818cf8 78%, #67e8f9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 }
 
-/* Улучшенная типографика */
-.text-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Эффект свечения для важных элементов */
-.glow-effect {
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-}
-
-.glow-effect:hover {
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
-}
-
-/* Анимация загрузки страницы */
-.page-load-animation {
-    opacity: 0;
-    animation: fadeInUp 1s ease-out forwards;
-}
-
-/* Улучшенные скроллбары */
-::-webkit-scrollbar {
+/* Скроллбар в тон теме */
+.nerpa-landing ::-webkit-scrollbar {
     width: 8px;
 }
 
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
+.nerpa-landing ::-webkit-scrollbar-track {
+    background: rgba(5, 10, 24, 0.5);
 }
 
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.nerpa-landing ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--nerpa-primary-start), var(--nerpa-primary-end));
     border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }

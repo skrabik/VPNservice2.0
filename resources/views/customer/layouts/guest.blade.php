@@ -12,7 +12,7 @@
         <div class="customer-shell mx-auto flex min-h-screen max-w-6xl items-center px-4 py-10">
             <div class="grid w-full gap-8 lg:grid-cols-2">
                 <div class="customer-panel customer-panel-hero rounded-3xl p-8">
-                    <p class="customer-kicker mb-3 text-sm">Quantum Shield</p>
+                    <p class="customer-kicker mb-3 text-sm">NerpaVPN</p>
                     <h1 class="customer-page-title mb-4 text-4xl font-semibold">Веб-кабинет клиента</h1>
                     <p class="customer-page-text text-base leading-7">
                         Управляйте ключами, проверяйте подписку, открывайте инструкции и пишите в поддержку без Telegram.

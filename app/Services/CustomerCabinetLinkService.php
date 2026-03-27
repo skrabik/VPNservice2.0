@@ -33,7 +33,7 @@ class CustomerCabinetLinkService
             return 'https://t.me/'.$botName;
         }
 
-        return 'https://t.me/quantum_shield_bot';
+        return 'https://t.me/nerpavpn_bot';
     }
 
     public function getBotStartUrl(string $payload): string

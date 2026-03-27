@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\TelegramCommandLog;
+use App\Services\CustomerCabinetLinkService;
 
 class LandingController extends Controller
 {
+    public function __construct(
+        private CustomerCabinetLinkService $customerCabinetLinkService
+    ) {}
+
     public function index()
     {
-        return view('landing.index');
+        return view('landing.index', [
+            'telegramBotUrl' => $this->customerCabinetLinkService->getBotUrl(),
+        ]);
     }
 
     public function clickStat()
@@ -19,6 +26,6 @@ class LandingController extends Controller
             'action' => 'Перешёл по ссылке на бота в телеге',
         ]);
 
-        return redirect('https://t.me/quantum_shield_bot');
+        return redirect()->away($this->customerCabinetLinkService->getBotUrl());
     }
 }

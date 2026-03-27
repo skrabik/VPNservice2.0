@@ -18,7 +18,7 @@ class StartCommand extends BaseCommand
             'action' => 'start',
         ]);
 
-        $message = "👋 Добро пожаловать в VPN сервис!\n\n".
+        $message = "👋 Добро пожаловать в NerpaVPN!\n\n".
             'Выберите нужную опцию:';
 
         $keyboard = TelegramKeyboard::mainMenu();
